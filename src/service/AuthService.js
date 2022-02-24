@@ -4,17 +4,13 @@ const API_KEY = process.env.API_KEY
 
 class AuthService {
     constructor() {
-        this.token = null;
-        this.error = null;
+        this.token = null
+        this.error = null
     }
 
     getError = () => this.error
 
-    setError = (e) => (this.error = e)
-
     getToken = () => this.token
-
-    setToken = (token) => (this.token = token)
 
     auth = async (email, password, isLogin) => {
         const authData = {
@@ -29,6 +25,7 @@ class AuthService {
         }
 
         try {
+            this.error = null
             const {data} = await axios.post(url, authData)
             const expirationDate = new Date(new Date().getTime() + data.expiresIn * 1000)
 

@@ -1,7 +1,6 @@
 import React, {useRef} from 'react'
 import {NavLink} from 'react-router-dom'
-import {Navbar, Nav, Container} from 'react-bootstrap';
-import {Button} from './UI/Button/Button'
+import {Navbar, Nav, Container, Button} from 'react-bootstrap';
 import Menu from '../../public/icons/menu.svg'
 import Exit from '../../public/icons/exit.svg'
 import Enter from '../../public/icons/enter.svg'
@@ -45,13 +44,13 @@ export const Navibar = props => {
 
 
 	return (
-		<Navbar collapseOnSelect expand="md" bg="dark" variant="light" fixed="top">
+		<Navbar collapseOnSelect expand="md" bg="white" variant="light" fixed="top">
 		  <Container className="container-fluid">
 		  <Nav onClick={() => setHide()}><Navbar.Brand as={NavLink} to='/'>{lang.appTitle}</Navbar.Brand></Nav>
 		  {
 		  	!props.auth
 		  	? <Nav><Nav.Link as={NavLink} to="/auth"><Enter /></Nav.Link></Nav>
-		  	: <><Button visibility='d-md-none' type='light' onClick={() => toggleHide()}><Menu/></Button>
+		  	: <><Button variant='light' className='d-md-none my-btn' onClick={() => toggleHide()}><Menu/></Button>
 			  <Navbar.Collapse ref={hideNav} >
 			    <Nav className='me-auto' onClick={() => toggleHide()} >
 			    	{

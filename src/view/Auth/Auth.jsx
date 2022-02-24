@@ -1,9 +1,10 @@
 import React from "react";
 import styles from './Auth.module.scss'
-import Input from '../../components/UI/Input/Input'
+import {Input} from '../../components/Input/Input'
 import {observer, inject} from "mobx-react";
 import {lang} from "../../lang";
 import {useNavigate} from 'react-router-dom'
+import {Button} from "react-bootstrap";
 
 const Auth = inject("AuthStore")(observer(({AuthStore}) => {
 
@@ -46,20 +47,19 @@ const Auth = inject("AuthStore")(observer(({AuthStore}) => {
 						onChange={event => AuthStore.onChangeHandler(event.target.value, 'password')}
 					/>
 
-				  {
+					{
 					  AuthStore.error ? <div className={styles.error}>{lang.signInError}</div> : null
-				  }
-
-				  <button
-					className="btn btn-light"
-					onClick={() => handleSubmit(true)}
-					disabled={!AuthStore.isFormValid}
-				  >{lang.signIn}</button>
-				  <button
-					className="btn btn-light"
-					onClick={() => AuthStore.registerHandler()}
-					disabled={!AuthStore.isFormValid}
-				  >{lang.signUp}</button>
+					}
+					<Button
+					  variant='light'
+					  onClick={() => handleSubmit(true)}
+					  disabled={!AuthStore.isFormValid}
+					>{lang.signIn}</Button>
+					<Button
+						variant='light'
+						onClick={() => AuthStore.registerHandler()}
+						disabled={!AuthStore.isFormValid}
+					>{lang.signUp}</Button>
 				</form>
 			</div>
 		</>

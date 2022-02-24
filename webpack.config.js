@@ -50,7 +50,7 @@ module.exports = () => {
                     },
                 },
                 {
-                    test: /\.s[ac]ss$/i,
+                    test: /\.(sass|less|css|scss)$/i,
                     use: [
                         {
                             loader: 'style-loader',

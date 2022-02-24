@@ -1,11 +1,14 @@
 /* make the customizations */
 
-$theme-colors: (
-    "danger": teal
-);
+$danger: deeppink;
+$success: #65D7AE;
+
 
 /* import bootstrap to set changes */
+@import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 @import "~bootstrap/scss/bootstrap";
+
+$my-box-shadow: 0 0 0 0 white;
 
 .navbar > .container, .navbar > .container-fluid {
 	max-width: 100%;
@@ -16,8 +19,17 @@ $theme-colors: (
 	background-color: white
 }
 
-.btn {
+.btn, .btn-close, .form-control, .dropdown > .dropdown-toggle, * {
+	&:focus, &:active, &.active {
+		box-shadow: $my-box-shadow;
+
 		&:focus {
-			box-shadow: 0 0 0 0 white;
+			box-shadow: $my-box-shadow;
 		}
 	}
+}
+
+.my-btn {
+	background: white;
+	border: white;
+}

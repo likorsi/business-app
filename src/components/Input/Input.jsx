@@ -1,12 +1,11 @@
 import React from 'react'
-import styles from'./Input.module.scss'
-import {observer} from "mobx-react";
+import styles from './Input.module.scss'
 
 function isInvalid({valid, touched, shouldValidate}) {
 	return !valid && shouldValidate && touched
 }
 
-const Input = props => {
+export const Input = props => {
 
 	const inputType = props.type || 'text'
 	const style = [styles.Input]
@@ -42,5 +41,3 @@ const Input = props => {
 		</div>
 	)
 }
-
-export default Input
