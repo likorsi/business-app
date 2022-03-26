@@ -1,10 +1,10 @@
 import React from "react";
 import styles from './Auth.module.scss'
-import {Input} from '../../components/Input/Input'
 import {observer, inject} from "mobx-react";
 import {lang} from "../../lang";
 import {useNavigate} from 'react-router-dom'
-import {Button} from "react-bootstrap";
+import {Button, Form, Stack} from "react-bootstrap";
+import ModalWindow from "../../components/ModalWindow";
 
 const Auth = inject("AuthStore")(observer(({AuthStore}) => {
 
@@ -12,56 +12,71 @@ const Auth = inject("AuthStore")(observer(({AuthStore}) => {
 
 	function handleSubmit(isLogin) {
 		isLogin ? AuthStore.loginHandler() : AuthStore.registerHandler()
-		console.log(AuthStore.token)
 		if (AuthStore.token) {
-			navigate('/', { replace: true })
+			navigate('/products')
 		}
 	}
 
 	return (
 		<>
 			<h3 className={`container-fluid ${styles.auth}`}>{lang.appTitle}</h3>
-			<div className={`container-fluid ${styles.authForm}`}>
-				<form onSubmit={ event => {event.preventDefault()}} >
-					<Input
-						key='email'
-						type='email'
-						value={AuthStore.formControls.email.value}
-						valid={AuthStore.formControls.email.valid}
-						touched={AuthStore.formControls.email.touched}
-						label={lang.inputEmailLabel}
-						shouldValidate={!!AuthStore.formControls.email.validation}
-						errorMsg={lang.inputEmailErrorMsg}
-						onChange={event => AuthStore.onChangeHandler(event.target.value, 'email')}
+			<Form className={`container-fluid ${styles.authForm}`}>
+				<Form.Group className="mb-3">
+					<Form.Label><div className='required'/>{lang.inputEmailLabel}</Form.Label>
+					{ !AuthStore.email.valid && <p className='hint-warning'>{lang.inputEmailErrorMsg}</p> }
+					<Form.Control
+						type="email"
+						value={AuthStore.email.value}
+						onChange={event => AuthStore.onChangeEmailHandler(event.target.value)}
 					/>
-					<Input
-						key='password'
-						type='password'
-						value={AuthStore.formControls.password.value}
-						valid={AuthStore.formControls.password.valid}
-						touched={AuthStore.formControls.password.touched}
-						label={lang.inputPasswordLabel}
-						shouldValidate={!!AuthStore.formControls.password.validation}
-						helpText={lang.inputPasswordHelpText}
-						errorMsg={lang.inputPasswordErrorMsg}
-						onChange={event => AuthStore.onChangeHandler(event.target.value, 'password')}
+				</Form.Group>
+				<Form.Group className="mb-3">
+					<Form.Label><div className='required'/>{lang.inputPasswordLabel}</Form.Label>
+					<p className='hint'>{lang.inputPasswordHelpText}</p>
+					{ !AuthStore.password.valid && <p className='hint-warning'>{lang.inputPasswordErrorMsg}</p> }
+					<Form.Control
+						type="password"
+						value={AuthStore.password.value}
+						onChange={event => AuthStore.onChangePasswordHandler(event.target.value)}
 					/>
-
-					{
-					  AuthStore.error ? <div className={styles.error}>{lang.signInError}</div> : null
-					}
-					<Button
-					  variant='light'
-					  onClick={() => handleSubmit(true)}
-					  disabled={!AuthStore.isFormValid}
-					>{lang.signIn}</Button>
+				</Form.Group>
+				{
+					AuthStore.error ? <div className={styles.error}>{lang.signInError}</div> : null
+				}
+				<Stack direction='horizontal'>
 					<Button
 						variant='light'
-						onClick={() => AuthStore.registerHandler()}
+						onClick={() => handleSubmit(true)}
 						disabled={!AuthStore.isFormValid}
-					>{lang.signUp}</Button>
-				</form>
-			</div>
+					>
+						{lang.signIn}
+					</Button>
+					<Button
+						variant='light'
+						onClick={() => handleSubmit(false)}
+						disabled={!AuthStore.isFormValid}
+					>
+						{lang.signUp}
+					</Button>
+					<Button
+						className='ms-auto'
+						variant='light'
+						onClick={() => AuthStore.onResetPassword()}
+						disabled={!AuthStore.email.valid}
+					>
+						{lang.resetPassword}
+					</Button>
+				</Stack>
+			</Form>
+
+			<ModalWindow
+				show={AuthStore.isResetModalWindowOpen}
+				title={lang.resetPasswordTitle}
+				onClose={() => AuthStore.onCloseWindow()}
+				hideFooter={true}
+			>
+				{lang.resetPasswordInfo}
+			</ModalWindow>
 		</>
 	)
 }))

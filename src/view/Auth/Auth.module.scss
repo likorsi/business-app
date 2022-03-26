@@ -1,21 +1,15 @@
 .auth {
 	text-align: center;
-	margin-top: 80px;
+	margin-top: 60px;
 	margin-bottom: 20px;
 }
 
 .authForm {
-	// margin-top: 100px;
 	padding: 20px;
 	max-width: 600px;
 	border: 1px solid #ced4da;
 	border-radius: 15px;
 	transition: all 0.3s ease-in-out;
-
-
-	&:hover {
-		// box-shadow: 10px 10px 10px #ced4da;
-	}
 
 	input {
 		outline: #ced4da;
@@ -38,7 +32,7 @@
 }
 
 .error {
-	color: deeppink; 
+	color: deeppink;
 	font-size: 16px;
 	margin-bottom: 15px;
 	transition: all .3s ease-in-out;

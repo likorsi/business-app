@@ -1,61 +1,98 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {inject, observer} from "mobx-react";
-import {Col, Form, Row} from "react-bootstrap";
-import {CardItem} from "../../components/Card";
-import {PromptModal} from "../../components/PromptModal";
+import {Button, Col, Row, Stack} from "react-bootstrap";
+import CardItem from "../../components/CardItem";
+import ModalWindow from "../../components/ModalWindow.jsx";
 import {lang} from "../../lang";
 import ProductsToolbar from "./ProductsToolbar";
 import ToastNotify from "../../components/ToastNotify";
+import CreateProduct from "./CreateProduct";
+import CreateCategory from "./CreateCategory";
+import ShowProduct from "./ShowProduct";
+import {Loader} from "../../components/Loader/Loader";
+import {runInAction} from "mobx";
+import {useLocation} from "react-router-dom";
 
 const Products = inject("ProductsStore")(observer(({ProductsStore}) => {
 
+
+    let location = useLocation()
+
+    useEffect(() => {
+        location.pathname === '/products' && ProductsStore.onInit()
+    }, [location.pathname])
+
     return (
         <>
+            <Stack direction="horizontal" gap={2} style={{flexWrap: 'wrap', marginBottom: 15}}>
+                <Button variant="outline-secondary" onClick={() => runInAction(() => (ProductsStore.isModifyCategoryWindowOpen = true))}>{lang.addCategoryButton}</Button>
+                <Button variant="outline-secondary" onClick={() => runInAction(() => (ProductsStore.isModifyProductWindowOpen = true))}>{lang.addProductButton}</Button>
+            </Stack>
             <ProductsToolbar/>
-            <Row xs={1} md={3} className="g-4">
-                {ProductsStore.products.map(item => (
-                    <Col key={item.id}>
-                        <CardItem
-                            title={item.name}
-                            warning={lang.limitWarningBadge}
-                            onDelete={() => ProductsStore.handleDeleteWindow(item)}
-                            onEdit={() => ProductsStore.handleEditWindow(item)}
-                        >{item.description || ''}</CardItem>
-                    </Col>
-                ))}
-            </Row>
+
+            {
+                ProductsStore.loading
+                    ? <div className='centered'><Loader/></div>
+                    : ProductsStore.products.length > 0
+                        ? <Row xs={1} sm={2} md={3} lg={4} xl={5} className="g-4" style={{marginTop: 10}}>
+                        {ProductsStore.products.map(product => (
+                            <Col key={product.id}>
+                                <CardItem
+                                    img={product.images}
+                                    title={product.name}
+                                    price={product.price}
+                                    badge={product.badge}
+                                    onDelete={() => runInAction(() => {
+                                        ProductsStore.selected = product
+                                        ProductsStore.isDeleteWindowOpen = true
+                                    })}
+                                    onEdit={() => runInAction(() => {
+                                        ProductsStore.selected = product
+                                        ProductsStore.newProduct.init(product)
+                                        ProductsStore.isModifyProductWindowOpen = true
+                                    })}
+                                    onCardClick={() => runInAction(() => {
+                                        ProductsStore.selected = product
+                                        ProductsStore.isShowProductWindowOpen = true
+                                    })}
+                                    onAddToCart={() => runInAction(() => {
+                                        ProductsStore.selected = product
+                                        ProductsStore.addToCart()
+                                    })}
+                                >{product.description || ''}</CardItem>
+                            </Col>
+                        ))}
+                    </Row>
+                    : <div className='centered'>{lang.noProducts}</div>
+            }
 
             <ToastNotify
                 show={ProductsStore.isShowToast}
-                onClose={() => (ProductsStore.isShowToast = false)}
+                onClose={() => (runInAction(() => ProductsStore.isShowToast = false))}
                 text={ProductsStore.toastText}
-                isSuccess={ProductsStore.toastStatus}
+                isSuccess={!ProductsStore.error}
             />
 
-            <PromptModal
-                title={lang.deleteProduct}
+            <ModalWindow
+                title={ProductsStore.isSelectedProduct ? lang.deleteProduct : lang.deleteCategory}
                 submitText={lang.deletePromptText}
                 submitType='outline-danger'
                 show={ProductsStore.isDeleteWindowOpen}
                 onClose={() => ProductsStore.onCloseWindow()}
-                onSubmit={() => ProductsStore.onDeleteProduct()}
-            >{`Вы действительно хотите удалить продукт "${ProductsStore.selectedProduct.name}"?`}</PromptModal>
-
-            <PromptModal
-                title={lang.editProduct}
-                submitText={lang.saveText}
-                submitType='outline-info'
-                show={ProductsStore.isEditWindowOpen}
-                onClose={() => ProductsStore.onCloseWindow()}
-                onSubmit={() => (ProductsStore.isEditWindowOpen = false)}
+                onSubmit={() => ProductsStore.isSelectedProduct ? ProductsStore.onDeleteProduct() : ProductsStore.onDeleteCategory()}
             >
-                <Form>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Название</Form.Label>
-                        <Form.Control type="text" value={ProductsStore.selectedProduct.name} />
-                    </Form.Group>
-                </Form>
-            </PromptModal>
+                {`Вы действительно хотите удалить ${ProductsStore.isSelectedProduct ? 'продукт' : 'категорию'} "${ProductsStore.selected?.name}"?`}
+            </ModalWindow>
+
+            <CreateProduct/>
+
+            {
+                ProductsStore.isSelectedProduct
+                    ? <>
+                        <ShowProduct/>
+                    </>
+                    : <CreateCategory/>
+            }
         </>
     )
 }))

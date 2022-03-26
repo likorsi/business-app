@@ -1,46 +1,67 @@
-import {action, makeAutoObservable, observable} from "mobx";
+import {action, computed, makeAutoObservable, observable} from "mobx";
 
 import AuthService from "../service/AuthService.js";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
+import {lang} from "../lang";
 
 class AuthStore {
-
     constructor() {
         makeAutoObservable(this)
+        onAuthStateChanged(getAuth(), (user) => {
+            this.profile = user
+            if (!user) {
+                this.token = null
+            } else {
+                this.token = localStorage.getItem('token')
+                this.publicUrl = `https://small-business-app/users/${user.uid}`
+            }
+        });
     }
 
-    @observable isFormValid = true
-    @observable formControls = {
-        email: {
-            value: '',
-            valid: false,
-            touched: false,
-            validation: {
-                required: true,
-                email: true,
-            }
-        },
-        password: {
-            value: '',
-            valid: false,
-            touched: false,
-            validation: {
-                required: true,
-                password: true
-            }
-        },
+    @observable profile = null
+    @observable publicUrl = null
+    @observable useMyTax = false
+
+    @observable password = {
+        value: '',
+        valid: false,
+        touched: false
     }
+
+    @observable email = {
+        value: '',
+        valid: false,
+        touched: false
+    }
+
+    @observable name = ''
+    @observable newPassword = ''
+    @observable newEmail = ''
+
     @observable error = null
     @observable token = null
+    @observable user = null
+
+    @observable isEditEmailWindowOpen = false
+    @observable isEditNameWindowOpen = false
+    @observable isEditPasswordWindowOpen = false
+    @observable isDeleteAccountWindowOpen = false
+    @observable isResetModalWindowOpen = false
+
+    @observable isShowToast = false
+    @observable toastText = ''
+    @observable toastStatus = false
 
     updateData = () => {
         this.error = AuthService.getError()
         this.token = AuthService.getToken()
+        this.profile = AuthService.getProfile()
     }
 
     @action loginHandler = async () => {
         await AuthService.auth(
-            this.formControls.email.value,
-            this.formControls.password.value,
+            this.email.value.trim(),
+            this.password.value.trim(),
             true
         )
         this.updateData()
@@ -48,15 +69,15 @@ class AuthStore {
 
     @action registerHandler = async () => {
         await AuthService.auth(
-            this.formControls.email.value,
-            this.formControls.password.value,
+            this.email.value.trim(),
+            this.password.value.trim(),
             false
         )
         this.updateData()
     }
 
-    @action logout = () => {
-        AuthService.logout()
+    @action logout = async () => {
+        await AuthService.logout()
         this.updateData()
     }
 
@@ -65,44 +86,116 @@ class AuthStore {
         this.updateData()
     }
 
-    validateControl(value, validation) {
-        let isValid = true
+    validateEmail = value => {
+        let re = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
 
-        if (validation.required) {
-            isValid = value.trim() !== '' && isValid
-        }
-
-        if (validation.email) {
-            let re = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
-            isValid = re.test(value.toLowerCase()) && isValid
-        }
-
-        if (validation.password) {
-            // let re = /^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}$/
-            let re = /^[0-9a-zA-Z]{6,}$/
-            isValid = re.test(value) && isValid
-        }
-
-        if (validation.minLength) {
-            isValid = value.length >= validation.minLength && isValid
-        }
-
-        return isValid
+        return value.trim() !== '' && re.test(value.toLowerCase())
     }
 
-    @action onChangeHandler = (value, controlName) => {
-        const control = this.formControls[controlName]
+    validatePassword = value => {
+        // let re = /^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}$/
+        let re = /^[0-9a-zA-Z]{6,}$/
 
-        control.value = value
-        control.touched = true
-        control.validation && (control.valid = this.validateControl(control.value, control.validation))
+        return value.trim() !== '' && re.test(value)
+    }
 
-        this.formControls[controlName] = control
-        this.isFormValid = true
+    @action onChangeEmailHandler = value => {
+        this.email.value = value
+        this.email.touched = true
+        this.email.valid = this.validateEmail(value)
+    }
 
-        Object.keys(this.formControls).forEach(name => {
-            this.isFormValid = this.formControls[name].valid && this.isFormValid
-        })
+    @action onChangePasswordHandler = value => {
+        this.password.value = value
+        this.password.touched = true
+        this.password.valid = this.validatePassword(value)
+    }
+
+    @computed get isFormValid() {
+        return this.password.valid && this.email.valid
+    }
+
+    onCloseWindow = () => {
+        this.isDeleteAccountWindowOpen = false
+        this.isEditPasswordWindowOpen = false
+        this.isEditEmailWindowOpen = false
+        this.isEditNameWindowOpen = false
+        this.isResetModalWindowOpen = false
+        this.email.value = ''
+        this.email.touched = false
+        this.email.valid = false
+        this.password.value = ''
+        this.password.touched = false
+        this.password.valid = false
+        this.name = ''
+        this.newPassword = ''
+        this.newEmail = ''
+    }
+
+    onResetPassword = async () => {
+        await AuthService.resetPassword(this.email.value)
+        this.error = AuthService.getError()
+        !this.error && (this.isResetModalWindowOpen = true)
+    }
+
+    onEditEmail = async () => {
+        await AuthService.updateUserEmail(this.newEmail, this.email.value, this.password.value)
+        this.error = AuthService.getError()
+        this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
+        this.isShowToast = true
+        if (!this.error) {
+            this.profile = getAuth().currentUser
+            this.onCloseWindow()
+        }
+    }
+
+    onEditPassword = async () => {
+        await AuthService.updateUserPassword(this.newPassword, this.email.value, this.password.value)
+        this.error = AuthService.getError()
+        this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
+        this.isShowToast = true
+        if (!this.error) {
+            this.profile = getAuth().currentUser
+            this.onCloseWindow()
+        }
+    }
+
+    onEditName = async () => {
+        await AuthService.updateUsername(this.name)
+        this.error = AuthService.getError()
+        this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
+        this.isShowToast = true
+        if (!this.error) {
+            this.onCloseWindow()
+        }
+    }
+
+    onCheckMyTaxOption = async (flag) => {
+        await AuthService.updateCheckMyTaxOption(flag)
+        this.error = AuthService.getError()
+        this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
+        this.isShowToast = true
+        if (!this.error) {
+            this.useMyTax = AuthService.useMyTax
+            this.onCloseWindow()
+        }
+    }
+
+    onDeleteAccount = async () => {
+        await AuthService.deleteUserAccount()
+        this.error = AuthService.getError()
+        if (this.error) {
+            this.toastText = lang.errorDeleteAccount
+            this.isShowToast = true
+        } else {
+            this.token = null
+            localStorage.removeItem('token')
+        }
+    }
+
+    onInitProfile = async () => {
+        await AuthService.loadMyTaxOption()
+        this.useMyTax = AuthService.useMyTax
     }
 }
 

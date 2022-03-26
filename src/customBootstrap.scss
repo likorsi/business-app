@@ -1,7 +1,8 @@
 /* make the customizations */
 
 $danger: deeppink;
-$success: #65D7AE;
+$success: #3ad166;
+
 
 
 /* import bootstrap to set changes */
@@ -32,4 +33,32 @@ $my-box-shadow: 0 0 0 0 white;
 .my-btn {
 	background: white;
 	border: white;
+}
+
+.centered {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%
+}
+
+.hint {
+	opacity: 0.7;
+	font-size: 0.8em;
+
+	&-warning {
+		@extend .hint;
+		color: $danger;
+	}
+}
+
+.required {
+	display: inline-block;
+	background: $danger;
+	border-radius: 50%;
+	box-shadow: 0.05em 0.05em 0 0 rgba(15, 28, 63, 0.125);
+	height: 0.45em;
+	width: 0.45em;
+	margin-bottom: 2px;
+	margin-right: 8px;
 }

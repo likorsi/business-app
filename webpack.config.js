@@ -19,12 +19,12 @@ module.exports = () => {
     return {
         devServer: {
             historyApiFallback: true,
-            static: './',
-            hot: true
+            hot: true,
         },
         output: {
             path: path.resolve(__dirname, 'build'),
             filename: 'bundle.js',
+            publicPath: '/',
         },
         resolve: {
             extensions: ['', '.js', '.jsx'],

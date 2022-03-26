@@ -1,41 +1,90 @@
-import axios from "axios";
-
-const API_KEY = process.env.API_KEY
+import { initializeApp } from 'firebase/app';
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut,
+    getAuth,
+    updateProfile,
+    updateEmail,
+    updatePassword,
+    deleteUser,
+    sendPasswordResetEmail
+} from "firebase/auth";
+import {getDatabase, set, ref as refDB, update, onValue, get, child, remove} from "firebase/database";
 
 class AuthService {
     constructor() {
-        this.token = null
+        initializeApp({
+            apiKey: process.env.API_KEY,
+            authDomain: `${process.env.PROJECT_ID}.firebaseapp.com`,
+            databaseURL: `https://${process.env.DATABASE_NAME}.firebasedatabase.app/`,
+            projectId: process.env.PROJECT_ID,
+            storageBucket: `${process.env.STORAGE_BUCKET}.appspot.com`
+        })
+        this.getAuth = getAuth()
+        this.user = localStorage.getItem('userId')
+        this.token = localStorage.getItem('token')
         this.error = null
+        this.profile = null
+        this.useMyTax = false
+
+        onAuthStateChanged(getAuth(), async (user) => {
+            if (user) {
+                this.profile = user
+                console.log('profile', this.profile)
+
+            } else {
+                await this.logout()
+                localStorage.removeItem('token')
+                console.log('User is signed out')
+            }
+        });
+
+        onValue(refDB(getDatabase(), `${localStorage.getItem('userId')}/info`), snapshot => {
+            if (snapshot.exists()) {
+                this.useMyTax = snapshot.val().useMyTaxOption
+            }
+        });
     }
+
+    getProfile = () => this.profile
 
     getError = () => this.error
 
     getToken = () => this.token
 
     auth = async (email, password, isLogin) => {
-        const authData = {
-            email, password,
-            returnSecureToken: true,
-        }
-
-        let url = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`
-
-        if (isLogin) {
-            url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`
-        }
-
         try {
             this.error = null
-            const {data} = await axios.post(url, authData)
-            const expirationDate = new Date(new Date().getTime() + data.expiresIn * 1000)
+            let response = null
+            if (isLogin) {
+                response = await signInWithEmailAndPassword(this.getAuth, email, password)
+            } else {
+                response = await createUserWithEmailAndPassword(this.getAuth, email, password)
+            }
 
-            localStorage.setItem('token', data.idToken)
-            localStorage.setItem('userId', data.localId)
+            this.token = response.user.accessToken
+            this.user = response.user.uid
+            localStorage.setItem('token', this.token)
+            localStorage.setItem('userId', this.user)
+            const expirationDate = new Date(new Date().getTime() + response._tokenResponse.expiresIn * 1000)
             localStorage.setItem('expirationDate', expirationDate)
-            this.token = data.idToken
-            this.autoLogout(data.expiresIn)
+            this.autoLogout(response._tokenResponse.expiresIn)
+
+            if (isLogin) {
+                const snapshot = await get(child(refDB(getDatabase()), `${localStorage.getItem('userId')}/info`))
+                this.useMyTax = snapshot.val().useMyTaxOption
+            } else {
+                await set(refDB(getDatabase(), `${localStorage.getItem('userId')}/info`), {
+                    user: localStorage.getItem('userId'),
+                    useMyTaxOption: false
+                })
+            }
+
         } catch (e) {
             this.error = JSON.stringify(e)
+            console.log(this.error)
         }
     }
 
@@ -55,15 +104,96 @@ class AuthService {
     }
 
     autoLogout = (time) => {
-        setTimeout(() => this.logout(), time * 1000)
+        // setTimeout(() => this.logout(), time * 10000)
+    }
+
+    updateUsername = async (username) => {
+        try {
+            this.error = null
+            await updateProfile(getAuth().currentUser, {
+                displayName: username
+            })
+        } catch (e) {
+            this.error = e
+        }
+    }
+
+    updateUserEmail = async (newEmail, email, password) => {
+        try {
+            this.error = null
+            await signInWithEmailAndPassword(getAuth(), email, password)
+            await updateEmail(getAuth().currentUser, newEmail)
+        } catch (e) {
+            this.error = e
+        }
+    }
+
+    updateUserPassword = async (newPassword, email, password) => {
+        try {
+            this.error = null
+            await signInWithEmailAndPassword(getAuth(), email, password)
+            await updatePassword(getAuth().currentUser, newPassword)
+        } catch (e) {
+            this.error = e
+        }
+    }
+
+    deleteUserAccount = async () => {
+        try {
+            this.error = null
+            await deleteUser(getAuth().currentUser)
+            await remove(refDB(getDatabase(), `${localStorage.getItem('userId')}`));
+        } catch (e) {
+            this.error = e
+        }
+    }
+
+    resetPassword = async (email) => {
+        try {
+            this.error = null
+            await sendPasswordResetEmail(getAuth(), email)
+        } catch (e) {
+            this.error = e
+        }
+    }
+
+    updateCheckMyTaxOption = async (flag) => {
+        try {
+            this.error = null
+            await update(refDB(getDatabase(), `${localStorage.getItem('userId')}/info`), {
+                useMyTaxOption: flag
+            });
+        } catch (e) {
+            this.error = e
+        }
+    }
+
+    loadMyTaxOption = async () => {
+        try {
+            this.error = null
+            const snapshot = await get(child(refDB(getDatabase()), `${localStorage.getItem('userId')}/info`))
+
+            if (snapshot.exists()) {
+                this.useMyTax = snapshot.val().useMyTaxOption
+            }
+
+        } catch (e) {
+            this.error = e
+        }
     }
 
 
-    logout = () => {
-        localStorage.removeItem('token')
-        localStorage.removeItem('userId')
-        localStorage.removeItem('expirationDate')
-        this.token = null
+    logout = async () => {
+        try {
+            await signOut(this.getAuth)
+
+            localStorage.removeItem('token')
+            localStorage.removeItem('userId')
+            localStorage.removeItem('expirationDate')
+            this.token = null
+            this.user = null
+
+        } catch (e) { console.log(e) }
     }
 }
 
