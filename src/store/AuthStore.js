@@ -21,6 +21,7 @@ class AuthStore {
     @observable profile = null
     @observable publicUrl = null
     @observable useMyTax = false
+    @observable useMyTaxChecked = false
 
     @observable password = {
         value: '',
@@ -47,6 +48,7 @@ class AuthStore {
     @observable isEditPasswordWindowOpen = false
     @observable isDeleteAccountWindowOpen = false
     @observable isResetModalWindowOpen = false
+    @observable isLoginToMyTaxWindowOpen = false
 
     @observable isShowToast = false
     @observable toastText = ''
@@ -121,6 +123,7 @@ class AuthStore {
         this.isEditEmailWindowOpen = false
         this.isEditNameWindowOpen = false
         this.isResetModalWindowOpen = false
+        this.isLoginToMyTaxWindowOpen = false
         this.email.value = ''
         this.email.touched = false
         this.email.valid = false
@@ -170,17 +173,6 @@ class AuthStore {
         }
     }
 
-    onCheckMyTaxOption = async (flag) => {
-        await AuthService.updateCheckMyTaxOption(flag)
-        this.error = AuthService.getError()
-        this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
-        this.isShowToast = true
-        if (!this.error) {
-            this.useMyTax = AuthService.useMyTax
-            this.onCloseWindow()
-        }
-    }
-
     onDeleteAccount = async () => {
         await AuthService.deleteUserAccount()
         this.error = AuthService.getError()
@@ -190,6 +182,28 @@ class AuthStore {
         } else {
             this.token = null
             localStorage.removeItem('token')
+        }
+    }
+
+    onCheckMyTaxOption = async () => {
+        await AuthService.updateCheckMyTaxOption(this.useMyTaxChecked)
+        this.error = AuthService.getError()
+        this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
+        this.isShowToast = true
+        if (!this.error) {
+            this.useMyTax = AuthService.useMyTax
+            this.onCloseWindow()
+        }
+    }
+
+    onLoginToMyTax = async () => {
+        await AuthService.loginToMyTax(this.newEmail, this.newPassword)
+        this.error = AuthService.getError()
+        this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
+        this.isShowToast = true
+        if (!this.error) {
+            this.useMyTax = AuthService.useMyTax
+            this.onCloseWindow()
         }
     }
 

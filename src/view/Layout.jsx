@@ -10,8 +10,8 @@ const Layout = inject('AuthStore')(observer(({AuthStore}) => {
 
     const links = [
         {'label': lang.products, 'to': '/products', 'status': ''},
-        {'label': lang.orders, 'to': '/orders', 'status': 'disabled'},
-        {'label': lang.tasks, 'to': '/tasks', 'status': 'disabled'},
+        {'label': lang.orders, 'to': '/orders', 'status': ''},
+        {'label': lang.tasks, 'to': '/tasks', 'status': ''},
         {'label': lang.contacts, 'to': '/contacts', 'status': ''},
         {'label': lang.templates, 'to': '/templates', 'status': 'disabled'},
         {'label': lang.statistics, 'to': '/statistics', 'status': 'disabled'},
@@ -20,7 +20,11 @@ const Layout = inject('AuthStore')(observer(({AuthStore}) => {
 
     return (
         <Container fluid className='App'>
-            <Navibar links={links} auth={!!AuthStore.token} logout={() => AuthStore.logout()}/>
+            <Navibar
+                links={links}
+                auth={!!AuthStore.token}
+                logout={() => AuthStore.logout()}
+            />
             <main>
                 <Outlet />
             </main>

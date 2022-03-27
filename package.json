@@ -24,6 +24,7 @@
     "firebase": "^9.6.7",
     "mobx": "^6.3.13",
     "mobx-react": "^7.2.1",
+    "moy-nalog": "^1.0.5",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
     "react-bootstrap": "^2.1.2",

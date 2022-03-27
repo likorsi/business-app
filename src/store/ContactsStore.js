@@ -35,7 +35,7 @@ class ContactsStore {
     }
 
     @action onModifyContact = async () => {
-        await ContactsService.createContact(this.newContact)
+        await ContactsService.createOrUpdateContact(this.newContact)
         this.error = ContactsService.getError()
         this.toastText = this.error ? lang.errorCreateContact : lang.successCreateContact
         this.isShowToast = true

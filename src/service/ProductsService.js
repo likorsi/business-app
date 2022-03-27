@@ -20,6 +20,7 @@ class ProductsService {
             if (snapshot.exists()) {
                 snapshot.val() && this.updateCategories(snapshot.val())
             } else {
+                this.categories =[]
                 console.log("No data available (categories)");
             }
         });
@@ -28,6 +29,7 @@ class ProductsService {
             if (snapshot.exists()) {
                 snapshot.val() && (await this.updateProducts(snapshot.val()))
             } else {
+                this.products = []
                 console.log("No data available (products)");
             }
         });
@@ -119,7 +121,7 @@ class ProductsService {
         }
     }
 
-    createProduct = async (product) => {
+    createOrUpdateProduct = async (product) => {
         try {
             this.error = null
 

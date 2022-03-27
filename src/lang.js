@@ -33,10 +33,11 @@ export const lang = {
     profile: {
         email: 'Email',
         newEmail: 'Новый email',
+        login: 'Логин',
         phoneNumber: 'Номер телефона',
         publicUrl: 'Публичная ссылка на аккаунт',
         publicUrlSub: 'По ссылке для всех пользователей будет доступ к каталогу и созданию заказа',
-        useMyTaxAccount: 'Использовать учетные данные для интеграции с «Мой налог»',
+        useMyTaxAccount: 'Отправлять данные о выполненных заказах в приложение «Мой налог»',
         newPassword: 'Новый пароль',
         password: 'Пароль',
         name: 'Имя пользователя',
@@ -49,9 +50,13 @@ export const lang = {
     changeEmailHelpText: 'Для изменения адреса email необходимо ввести свои прежние учетные данные',
     successSaveUserData: 'Учетные данные сохранены',
     errorSaveUserData: 'Не удалось сохранить учетные данные',
-    deleteAccount: 'Удаление аккаунта',
-    deleteAccountPrompt: 'Вы действительно хотите удалить аккаунт? Восстановить аккаунт будет невозможно.',
+    deleteAccount: 'Удалить аккаунт',
+    deleteAccountTitle: 'Удаление аккаунта',
+    deleteAccountPrompt: 'Вы действительно хотите удалить аккаунт? Восстановить данные будет невозможно.',
     errorDeleteAccount: 'Не удалось удалить аккаунт',
+
+    loginToMyTax: 'Вход в аккаунт приложения "Мой налог"',
+    loginToMyTaxHelp: 'Введите учетные данные своего аккаунта приложения "Мой налог", чтобы автоматичнски отправлять данные о выполненных заказах и получать чеки.',
 
     // Products
     noProducts: 'Нет добавленных продуктов',
@@ -121,6 +126,16 @@ export const lang = {
       phone: 'Номер',
       description: 'Описание',
     },
+
+    // Tasks
+    noTasks: 'Нет добавленных задач',
+    addTask: 'Добавить задачу',
+    // createTask: 'Добавление контакта',
+    errorCreateTask: 'Сохранить задачу не удалось',
+    successCreateTask: 'Задача сохранена',
+    deleteTask: 'Удаление задачи',
+    errorDeleteTask: 'Удалить задачу не удалось',
+    successDeleteTask: 'Задача удалена',
 
 
 }

@@ -101,14 +101,12 @@ class ProductsStore {
     }
 
     @action onModifyProduct = async () => {
-        await ProductsService.createProduct(this.newProduct)
+        await ProductsService.createOrUpdateProduct(this.newProduct)
         this.error = ProductsService.getError()
         this.toastText = this.error ? lang.errorCreateProduct : lang.successCreateProduct
         this.isShowToast = true
         if (!this.error) {
-            this.loading = true
             await this.updateProducts()
-            this.loading = false
             this.onCloseWindow()
         }
     }
@@ -129,9 +127,7 @@ class ProductsStore {
         this.toastText = this.error ? lang.errorDeleteProduct : lang.successDeleteProduct
         this.isShowToast = true
         if (!this.error) {
-            this.loading = true
             await this.updateProducts()
-            this.loading = false
             this.onCloseWindow()
         }
     }

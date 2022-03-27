@@ -16,6 +16,7 @@ class ContactsService {
             if (snapshot.exists()) {
                 snapshot.val() && this.updateContacts(snapshot.val())
             } else {
+                this.contacts = []
                 console.log("No data available (contacts)");
             }
         });
@@ -25,7 +26,7 @@ class ContactsService {
 
     getContacts = () => this.contacts
 
-    createContact = async (contact) => {
+    createOrUpdateContact = async (contact) => {
         try {
             this.error = null
 

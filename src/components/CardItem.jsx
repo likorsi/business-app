@@ -10,7 +10,7 @@ import {lang} from "../lang";
 const CardItem = ({img, price, title, badge, onEdit, onDelete, onCardClick, onAddToCart}) => {
 
     return (
-        <Card style={{minHeight: 315}}>
+        <Card style={{minHeight: 350}}>
             <Carousel interval={null} controls={img.length > 1}>
                 {
                     img.length !== 0 ?
@@ -30,7 +30,9 @@ const CardItem = ({img, price, title, badge, onEdit, onDelete, onCardClick, onAd
                 }
             </Carousel>
 
-            <Card.Body>
+            <Card.Body
+                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}
+            >
                 <div onClick={() => onCardClick && onCardClick()}>
                     <Card.Title>
                         {title}

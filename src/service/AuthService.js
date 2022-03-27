@@ -12,6 +12,7 @@ import {
     sendPasswordResetEmail
 } from "firebase/auth";
 import {getDatabase, set, ref as refDB, update, onValue, get, child, remove} from "firebase/database";
+import NalogAPI from "moy-nalog";
 
 class AuthService {
     constructor() {
@@ -152,6 +153,27 @@ class AuthService {
         try {
             this.error = null
             await sendPasswordResetEmail(getAuth(), email)
+        } catch (e) {
+            this.error = e
+        }
+    }
+
+    loginToMyTax = async (login, password) => {
+        try {
+            this.error = null
+            console.log(login, password)
+            const nalog = new NalogAPI({autologin: false})
+
+            await nalog.auth(login, password)
+
+            const nalogToken = await nalog.getToken()
+            console.log(nalogToken)
+
+            // await update(refDB(getDatabase(), `${localStorage.getItem('userId')}/info`), {
+            //     useMyTaxOption: true,
+            //     nalogToken: nalogToken
+            // });
+            // await this.updateCheckMyTaxOption(true)
         } catch (e) {
             this.error = e
         }

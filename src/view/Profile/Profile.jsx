@@ -40,7 +40,12 @@ const Profile = inject("AuthStore")(observer(({AuthStore}) => {
                         style={{marginBottom: 15}}
                         checked={AuthStore.useMyTax}
                         label={lang.profile.useMyTaxAccount}
-                        onChange={e => AuthStore.onCheckMyTaxOption(e.target.checked)}
+                        onChange={e => runInAction(() => {
+                            AuthStore.useMyTaxChecked = e.target.checked
+                            e.target.checked
+                                ? (AuthStore.isLoginToMyTaxWindowOpen = true)
+                                :  AuthStore.onCheckMyTaxOption()
+                        })}
                     />
 
                     <Stack direction='horizontal'>
@@ -181,13 +186,41 @@ const Profile = inject("AuthStore")(observer(({AuthStore}) => {
             </ModalWindow>
 
             <ModalWindow
-                title={lang.deleteAccount}
+                title={lang.deleteAccountTitle}
                 submitText={lang.deletePromptText}
                 submitType='outline-danger'
                 show={AuthStore.isDeleteAccountWindowOpen}
                 onClose={() => AuthStore.onCloseWindow()}
                 onSubmit={() => AuthStore.onDeleteAccount()}
             >{lang.deleteAccountPrompt}</ModalWindow>
+
+            <ModalWindow
+                title={lang.loginToMyTax}
+                submitText={lang.saveText}
+                submitType='outline-info'
+                disableSave={!(AuthStore.newPassword.trim() && AuthStore.newEmail.trim())}
+                show={AuthStore.isLoginToMyTaxWindowOpen}
+                onClose={() => AuthStore.onCloseWindow()}
+                onSubmit={() => AuthStore.onLoginToMyTax()}
+            >
+                <p className='hint'>{lang.loginToMyTaxHelp}</p>
+                <Form.Group className="mb-3">
+                    <Form.Label><div className='required'/>{lang.profile.login}</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={AuthStore.newEmail}
+                        onChange={e => runInAction(() => {AuthStore.newEmail = e.target.value})}
+                    />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label><div className='required'/>{lang.profile.password}</Form.Label>
+                    <Form.Control
+                        type="password"
+                        value={AuthStore.newPassword}
+                        onChange={e => runInAction(() => {AuthStore.newPassword = e.target.value})}
+                    />
+                </Form.Group>
+            </ModalWindow>
 
             <ToastNotify
                 show={AuthStore.isShowToast || false}
