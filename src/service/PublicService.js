@@ -1,0 +1,93 @@
+import {getAuth} from "firebase/auth";
+import {child, get, getDatabase, ref as refDB} from "firebase/database";
+import {Category} from "../domain/Category";
+import {Product} from "../domain/Product";
+import {Photo} from "../domain/Photo";
+
+class PublicService {
+    constructor() {
+        this.categories = []
+        this.products = []
+        this.publicInfo = {
+            username: '',
+            helpText: ''
+        }
+        this.error = null
+        this.auth = getAuth()
+        this.db = getDatabase()
+        this.startUrl = ''
+    }
+
+    setStartUrl = (startUrl) => (this.startUrl = startUrl)
+
+    getPublicInfo = () => this.publicInfo
+
+    loadPublicInfo = async () => {
+        try {
+            this.error = null
+            const snapshot = await get(child(refDB(this.db), `${this.startUrl}/info`))
+            if (snapshot.exists()) {
+                const photo = new Photo()
+                photo.init(snapshot.val().photo)
+                this.publicInfo = {
+                    username: snapshot.val().username,
+                    helpText: snapshot.val().helpText,
+                    photo: photo
+                }
+            }
+        } catch (e) { this.error = e }
+    }
+
+    getCategories = () => this.categories
+
+    loadCategories = async () => {
+        try {
+            this.error = null
+            const snapshot = await get(child(refDB(this.db), `${this.startUrl}/categories`))
+            snapshot.val() && this.updateCategories(snapshot.val())
+        } catch (e) { this.error = e }
+    }
+
+    updateCategories = data => {
+        this.categories = Object.keys(data).map((key) => {
+            const category = new Category()
+            category.init({
+                id: key,
+                name: data[key].name
+            })
+            return category
+        })
+    }
+
+    getProducts = () => this.products
+
+    loadProducts = async () => {
+        try {
+            this.error = null
+            const snapshot = await get(child(refDB(this.db), `${this.startUrl}/products`))
+            snapshot.val() && this.updateProducts(snapshot.val())
+        } catch (e) {
+            this.error = e
+        }
+    }
+
+    updateProducts = data => {
+        this.products = Object.keys(data).map(key => {
+            const product = new Product()
+            product.init({
+                id: key,
+                ...data[key],
+                category: this.categories.find(({id}) => id === data[key].category)?.id || '0',
+                images: data[key].images?.map(img => {
+                    const newImg = new Photo()
+                    newImg.init(img)
+                    return newImg
+                })
+            })
+            return product
+        })
+        this.products = [...this.products.reverse()]
+    }
+}
+
+export default new PublicService()

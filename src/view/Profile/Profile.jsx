@@ -3,14 +3,16 @@ import {Button, Card, Form, Stack} from "react-bootstrap";
 import {inject, observer} from "mobx-react";
 import {lang} from "../../lang";
 import Edit from "../../../public/icons/edit.svg";
+import Delete from "../../../public/icons/delete.svg";
 import {runInAction} from "mobx";
-import ModalWindow from "../../components/ModalWindow";
 import ToastNotify from "../../components/ToastNotify";
 import {useLocation} from "react-router-dom";
+import EmptyCard from "../../../public/icons/emptyCard.svg";
+import EditProfile from "./EditProfile";
 
 const Profile = inject("AuthStore")(observer(({AuthStore}) => {
 
-    let location = useLocation()
+    const location = useLocation()
 
     useEffect(() => {
         location.pathname === '/profile' && AuthStore.onInitProfile()
@@ -18,14 +20,47 @@ const Profile = inject("AuthStore")(observer(({AuthStore}) => {
 
     return (
         <div className='centered'>
-            <Card style={{ width: '100%' }}>
+            <Card style={{ width: '100%' }} border='light'>
                 <Card.Body>
+                    <Stack direction='horizontal' style={{marginBottom: 20}}>
+                        {AuthStore.publicInfo?.photo.src
+                            ? <Card.Img className='circle-image' variant='top' src={AuthStore.publicInfo?.photo.src}/>
+                            : <EmptyCard/>
+                        }
+
+                        <Button
+                            style={{marginBottom: 4, marginLeft: 5}}
+                            onClick={() => runInAction(() => {
+                                AuthStore.newPhoto = null
+                                AuthStore.isEditPhotoWindowOpen = true
+                            })}
+                            variant="light"
+                            size='sm'
+                            className='my-btn'
+                        >
+                            <Edit/>
+                        </Button>
+                        { AuthStore.publicInfo?.photo.src &&
+                            <Button
+                                style={{marginBottom: 4}}
+                                onClick={() => runInAction(() => {
+                                    AuthStore.newPhoto = null
+                                    AuthStore.isDeletePhotoWindowOpen = true
+                                })}
+                                variant="light"
+                                size='sm'
+                                className='my-btn'
+                            >
+                                <Delete/>
+                            </Button>
+                        }
+                    </Stack>
                     <Stack direction='horizontal' style={{marginBottom: 20}}>
                         <Card.Title>{AuthStore.profile?.displayName || AuthStore.profile?.email}</Card.Title>
                         <Button
                             style={{marginBottom: 4}}
                             onClick={() => runInAction(() => {
-                                AuthStore.name = AuthStore.profile?.displayName || AuthStore.profile?.email
+                                AuthStore.newName = AuthStore.profile?.displayName || AuthStore.profile?.email
                                 AuthStore.isEditNameWindowOpen = true
                             })}
                             variant="light"
@@ -38,13 +73,13 @@ const Profile = inject("AuthStore")(observer(({AuthStore}) => {
 
                     <Form.Check
                         style={{marginBottom: 15}}
-                        checked={AuthStore.useMyTax}
-                        label={lang.profile.useMyTaxAccount}
+                        checked={AuthStore.nalogInfo.useMyTaxOption}
+                        label={lang.profile.useMyTaxOption}
                         onChange={e => runInAction(() => {
                             AuthStore.useMyTaxChecked = e.target.checked
                             e.target.checked
                                 ? (AuthStore.isLoginToMyTaxWindowOpen = true)
-                                :  AuthStore.onCheckMyTaxOption()
+                                :  AuthStore.onResetCheckMyTaxOption()
                         })}
                     />
 
@@ -83,6 +118,23 @@ const Profile = inject("AuthStore")(observer(({AuthStore}) => {
                     <p className="hint">{lang.profile.publicUrlSub}</p>
                     <Card.Text><a href={AuthStore.publicUrl} target='_blank'>{AuthStore.publicUrl}</a></Card.Text>
 
+                    <Stack direction='horizontal'>
+                        <Card.Subtitle>{lang.profile.helpText}</Card.Subtitle>
+                        <Button
+                            style={{marginBottom: 4}}
+                            onClick={() => runInAction(() => {
+                                AuthStore.newHelpText = AuthStore.publicInfo.helpText
+                                AuthStore.isEditHelpTextWindowOpen = true
+                            })}
+                            variant="light"
+                            size='sm'
+                            className='my-btn'
+                        >
+                            <Edit/>
+                        </Button>
+                    </Stack>
+                    <Card.Text>{AuthStore.publicInfo.helpText? AuthStore.publicInfo.helpText.split('\n').map((row, index) => <span key={index}>{row}<br/></span>) : <span>&#8212;</span>}</Card.Text>
+
                     <Button
                         style={{marginBottom: 20}}
                         variant="outline-danger"
@@ -93,134 +145,7 @@ const Profile = inject("AuthStore")(observer(({AuthStore}) => {
                 </Card.Body>
             </Card>
 
-            <ModalWindow
-                title={lang.profile.email}
-                submitText={lang.saveText}
-                submitType='outline-info'
-                disableSave={!(AuthStore.validateEmail(AuthStore.newEmail) && AuthStore.isFormValid)}
-                show={AuthStore.isEditEmailWindowOpen}
-                onClose={() => AuthStore.onCloseWindow()}
-                onSubmit={() => AuthStore.onEditEmail()}
-            >
-                <p className='hint'>{lang.changeEmailHelpText}</p>
-                <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.profile.newEmail}</Form.Label>
-                    <Form.Control
-                        type="email"
-                        value={AuthStore.newEmail}
-                        onChange={e => runInAction(() => {AuthStore.newEmail = e.target.value})}
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.profile.email}</Form.Label>
-                    <Form.Control
-                        type="email"
-                        value={AuthStore.email.value}
-                        onChange={e => AuthStore.onChangeEmailHandler(e.target.value)}
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.profile.password}</Form.Label>
-                    <Form.Control
-                        type="password"
-                        value={AuthStore.password.value}
-                        onChange={e => AuthStore.onChangePasswordHandler(e.target.value)}
-                    />
-                </Form.Group>
-            </ModalWindow>
-
-            <ModalWindow
-                title={lang.profile.name}
-                submitText={lang.saveText}
-                submitType='outline-info'
-                disableSave={!AuthStore.name.trim()}
-                show={AuthStore.isEditNameWindowOpen}
-                onClose={() => AuthStore.onCloseWindow()}
-                onSubmit={() => AuthStore.onEditName()}
-            >
-                <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.profile.name}</Form.Label>
-                    <Form.Control
-                        type="text"
-                        value={AuthStore.name}
-                        onChange={e => runInAction(() => {AuthStore.name = e.target.value})}
-                    />
-                </Form.Group>
-            </ModalWindow>
-
-            <ModalWindow
-                title={lang.profile.password}
-                submitText={lang.saveText}
-                submitType='outline-info'
-                disableSave={!(AuthStore.validatePassword(AuthStore.newPassword) && AuthStore.isFormValid)}
-                show={AuthStore.isEditPasswordWindowOpen}
-                onClose={() => AuthStore.onCloseWindow()}
-                onSubmit={() => AuthStore.onEditPassword()}
-            >
-                <p className='hint'>{lang.changePasswordHelpText}</p>
-                <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.profile.newPassword}</Form.Label>
-                    <Form.Control
-                        type="password"
-                        value={AuthStore.newPassword}
-                        onChange={e => runInAction(() => {AuthStore.newPassword = e.target.value})}
-                    />
-                </Form.Group>
-                <p className='hint'>{lang.inputPasswordHelpText}</p>
-                <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.profile.email}</Form.Label>
-                    <Form.Control
-                        type="email"
-                        value={AuthStore.email.value}
-                        onChange={e => AuthStore.onChangeEmailHandler(e.target.value)}
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.profile.password}</Form.Label>
-                    <Form.Control
-                        type="password"
-                        value={AuthStore.password.value}
-                        onChange={e => AuthStore.onChangePasswordHandler(e.target.value)}
-                    />
-                </Form.Group>
-            </ModalWindow>
-
-            <ModalWindow
-                title={lang.deleteAccountTitle}
-                submitText={lang.deletePromptText}
-                submitType='outline-danger'
-                show={AuthStore.isDeleteAccountWindowOpen}
-                onClose={() => AuthStore.onCloseWindow()}
-                onSubmit={() => AuthStore.onDeleteAccount()}
-            >{lang.deleteAccountPrompt}</ModalWindow>
-
-            <ModalWindow
-                title={lang.loginToMyTax}
-                submitText={lang.saveText}
-                submitType='outline-info'
-                disableSave={!(AuthStore.newPassword.trim() && AuthStore.newEmail.trim())}
-                show={AuthStore.isLoginToMyTaxWindowOpen}
-                onClose={() => AuthStore.onCloseWindow()}
-                onSubmit={() => AuthStore.onLoginToMyTax()}
-            >
-                <p className='hint'>{lang.loginToMyTaxHelp}</p>
-                <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.profile.login}</Form.Label>
-                    <Form.Control
-                        type="text"
-                        value={AuthStore.newEmail}
-                        onChange={e => runInAction(() => {AuthStore.newEmail = e.target.value})}
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.profile.password}</Form.Label>
-                    <Form.Control
-                        type="password"
-                        value={AuthStore.newPassword}
-                        onChange={e => runInAction(() => {AuthStore.newPassword = e.target.value})}
-                    />
-                </Form.Group>
-            </ModalWindow>
+            <EditProfile/>
 
             <ToastNotify
                 show={AuthStore.isShowToast || false}

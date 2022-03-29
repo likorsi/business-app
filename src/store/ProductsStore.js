@@ -19,6 +19,7 @@ class ProductsStore {
     @observable toastText = ''
     @observable toastStatus = false
     @observable loading = false
+    @observable loadingNewProduct = false
 
     @observable categories = []
     @observable products = []
@@ -55,17 +56,12 @@ class ProductsStore {
     @action updateCategories = async () => {
         this.categories = ProductsService.getCategories()
         this.filters.checkedCategories = this.categories.map(({id}) => id).concat('0')
-
     }
 
     @action updateProducts = async () => {
         await ProductsService.loadProducts()
         this.rawProducts = ProductsService.getProducts()
         this.filterProducts()
-    }
-
-    @action hideToast = () => {
-        this.isShowToast = false
     }
 
     @action onCloseWindow = () => {
@@ -101,7 +97,9 @@ class ProductsStore {
     }
 
     @action onModifyProduct = async () => {
+        this.loadingNewProduct = true
         await ProductsService.createOrUpdateProduct(this.newProduct)
+        this.loadingNewProduct = false
         this.error = ProductsService.getError()
         this.toastText = this.error ? lang.errorCreateProduct : lang.successCreateProduct
         this.isShowToast = true
@@ -132,13 +130,12 @@ class ProductsStore {
         }
     }
 
-    @action addToCart = () => {
-        console.log('addToCart: ', this.selected)
+    get filtersUsed() {
+        return this.filters.checkedCategories.length === this.categories.length + 1
     }
 
-    sleep = time => new Promise(r => setTimeout(r, time));
-
     @action onInit = async () => {
+        this.isShowToast = false
         this.loading = true
         await ProductsService.loadCategories()
         this.categories = ProductsService.getCategories()
@@ -146,6 +143,7 @@ class ProductsStore {
         await ProductsService.loadProducts()
         this.rawProducts = ProductsService.getProducts()
         this.products = [...this.rawProducts]
+        console.log(this.products)
         this.loading = false
     }
 }

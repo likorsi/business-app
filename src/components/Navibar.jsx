@@ -54,6 +54,7 @@ const Navibar = ({auth, links, logout}) => {
 			    <Nav >
 			      <Nav.Link
 				  	as={NavLink}
+					onClick={() => toggleHide()}
 		          	to="/profile"
 				  >
 				    <Profile/>

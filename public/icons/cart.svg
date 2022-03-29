@@ -1,0 +1,14 @@
+<svg viewBox="0 0 24 24" class="icon" width="44" height="44">
+    <style>
+        .icon * {
+        stroke: currentColor;
+        }
+        .icon:hover * {
+        stroke: black;
+        }
+    </style>
+    <path id="primary" d="M3,3H5.32a1,1,0,0,1,.93.63L10,13,8.72,15.55A1,1,0,0,0,9.62,17H19" style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1;"></path>
+    <polyline id="primary-2" data-name="primary" points="7.2 6 20.8 6 21 6 18.2 13 10 13" style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1;"></polyline>
+    <line id="primary-upstroke" x1="10.95" y1="20.5" x2="11.05" y2="20.5" style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1;"></line>
+    <line id="primary-upstroke-2" data-name="primary-upstroke" x1="16.95" y1="20.5" x2="17.05" y2="20.5" style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1;">
+</line></svg>

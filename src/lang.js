@@ -8,6 +8,7 @@ export const lang = {
     saveText: 'Сохранить',
     findText: 'Найти',
     checkAll: 'Все',
+    loading: 'Загрузка...',
 
     // NavBar
     entrance: 'Вход',
@@ -29,6 +30,13 @@ export const lang = {
     signInError: 'Неверный логин или пароль!',
     signUp: 'Зарегистрироваться',
 
+    // Public
+    noProductsForOrder: 'Владелец еще не добавил ни одного продукта',
+    cart: 'Корзина',
+    addToCart: 'В корзину',
+    productsInCart: 'В корзине ',
+    makeOrder: 'Заказать',
+
     // Profile
     profile: {
         email: 'Email',
@@ -36,11 +44,15 @@ export const lang = {
         login: 'Логин',
         phoneNumber: 'Номер телефона',
         publicUrl: 'Публичная ссылка на аккаунт',
-        publicUrlSub: 'По ссылке для всех пользователей будет доступ к каталогу и созданию заказа',
-        useMyTaxAccount: 'Отправлять данные о выполненных заказах в приложение «Мой налог»',
+        publicUrlSub: 'По ссылке для всех пользователей будет доступ к каталогу и созданию заказа' +
+            '\nЗаполните ник, фото профиля и информацию для пользователей, так будет легче узнать вашу страницу',
+        useMyTaxOption: 'Интеграция с «Мой налог»',
         newPassword: 'Новый пароль',
         password: 'Пароль',
         name: 'Имя пользователя',
+        photo: 'Фото профиля',
+        helpText: 'Информация для пользователей',
+        helpTextPlaceholder: 'Инструкция как с вами связаться, краткие указания к оформлению заказа или другая важная информация',
     },
     resetPassword: 'Сбросить пароль',
     resetPasswordTitle: 'Сброс пароля',
@@ -54,15 +66,18 @@ export const lang = {
     deleteAccountTitle: 'Удаление аккаунта',
     deleteAccountPrompt: 'Вы действительно хотите удалить аккаунт? Восстановить данные будет невозможно.',
     errorDeleteAccount: 'Не удалось удалить аккаунт',
+    deletePhoto: 'Удаление фото профиля',
+    deletePhotoPrompt: 'Вы действительно хотите удалить фото профиля?',
 
     loginToMyTax: 'Вход в аккаунт приложения "Мой налог"',
     loginToMyTaxHelp: 'Введите учетные данные своего аккаунта приложения "Мой налог", чтобы автоматичнски отправлять данные о выполненных заказах и получать чеки.',
 
     // Products
+    noProductsWithThisFilters: 'Нет продуктов, удовлетворяющих условиям поиска',
     noProducts: 'Нет добавленных продуктов',
     categories: 'Категории',
-    addCategoryButton: 'Добавить категорию',
-    addProductButton: 'Добавить продукт',
+    addCategory: 'Добавить категорию',
+    addProduct: 'Добавить продукт',
     showProductsWithBadge: 'С наклейкой',
     sorting: {
         default: 'По добавлению',
@@ -103,7 +118,6 @@ export const lang = {
     },
 
     addOption: 'Добавить опцию',
-    addToCart: 'В корзину',
 
     badge: {
       limit: 'Осталось мало',
@@ -130,12 +144,40 @@ export const lang = {
     // Tasks
     noTasks: 'Нет добавленных задач',
     addTask: 'Добавить задачу',
-    // createTask: 'Добавление контакта',
     errorCreateTask: 'Сохранить задачу не удалось',
     successCreateTask: 'Задача сохранена',
     deleteTask: 'Удаление задачи',
     errorDeleteTask: 'Удалить задачу не удалось',
     successDeleteTask: 'Задача удалена',
 
-
+    // Orders
+    noOrdersWithThisFilters: 'Нет заказов, удовлетворяющих условиям поиска',
+    noOrders: 'Нет добавленных заказов',
+    addOrder: 'Добавить заказ',
+    editOrder: 'Изменение заказа',
+    createOrder: 'Добавление заказа',
+    errorCreateOrder: 'Сохранить заказ не удалось',
+    successCreateOrder: 'Заказ сохранен',
+    deleteOrder: 'Удаление заказа',
+    errorDeleteOrder: 'Удалить заказ не удалось',
+    successDeleteOrder: 'Заказ удален',
+    findOrder: 'Найти заказ',
+    orderStatus: {
+        0: 'Создан',
+        1: 'Ожидает оплаты',
+        2: 'Оплачен',
+        3: 'В работе',
+        4: 'Отправлен',
+        5: 'Завершен',
+        6: 'Отменен',
+    },
+    order: {
+        name: 'name',
+        client: 'Покупатель',
+        products: 'Состав',
+        amount: 'Стоимость',
+        description: 'Описание',
+        orderNumber: 'Номер заказа',
+        status: 'Статус',
+    },
 }

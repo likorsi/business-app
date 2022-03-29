@@ -16,7 +16,7 @@ import {useLocation} from "react-router-dom";
 const Products = inject("ProductsStore")(observer(({ProductsStore}) => {
 
 
-    let location = useLocation()
+    const location = useLocation()
 
     useEffect(() => {
         location.pathname === '/products' && ProductsStore.onInit()
@@ -25,9 +25,10 @@ const Products = inject("ProductsStore")(observer(({ProductsStore}) => {
     return (
         <>
             <Stack direction="horizontal" gap={2} style={{flexWrap: 'wrap', marginBottom: 15}}>
-                <Button variant="outline-secondary" onClick={() => runInAction(() => (ProductsStore.isModifyCategoryWindowOpen = true))}>{lang.addCategoryButton}</Button>
-                <Button variant="outline-secondary" onClick={() => runInAction(() => (ProductsStore.isModifyProductWindowOpen = true))}>{lang.addProductButton}</Button>
+                <Button variant="outline-secondary" onClick={() => runInAction(() => (ProductsStore.isModifyCategoryWindowOpen = true))}>{lang.addCategory}</Button>
+                <Button variant="outline-secondary" onClick={() => runInAction(() => (ProductsStore.isModifyProductWindowOpen = true))}>{lang.addProduct}</Button>
             </Stack>
+
             <ProductsToolbar/>
 
             {
@@ -44,6 +45,7 @@ const Products = inject("ProductsStore")(observer(({ProductsStore}) => {
                                     badge={product.badge}
                                     onDelete={() => runInAction(() => {
                                         ProductsStore.selected = product
+                                        ProductsStore.newProduct.init(product)
                                         ProductsStore.isDeleteWindowOpen = true
                                     })}
                                     onEdit={() => runInAction(() => {
@@ -53,17 +55,14 @@ const Products = inject("ProductsStore")(observer(({ProductsStore}) => {
                                     })}
                                     onCardClick={() => runInAction(() => {
                                         ProductsStore.selected = product
+                                        ProductsStore.newProduct.init(product)
                                         ProductsStore.isShowProductWindowOpen = true
                                     })}
-                                    onAddToCart={() => runInAction(() => {
-                                        ProductsStore.selected = product
-                                        ProductsStore.addToCart()
-                                    })}
-                                >{product.description || ''}</CardItem>
+                                >{product.description?.split('\n').map((row, index) => <span key={index}>{row}<br/></span>) || ''}</CardItem>
                             </Col>
                         ))}
                     </Row>
-                    : <div className='centered'>{lang.noProducts}</div>
+                    : <div className='centered'>{ProductsStore.filtersUsed ? lang.noProducts : lang.noProductsWithThisFilters}</div>
             }
 
             <ToastNotify
@@ -89,7 +88,12 @@ const Products = inject("ProductsStore")(observer(({ProductsStore}) => {
             {
                 ProductsStore.isSelectedProduct
                     ? <>
-                        <ShowProduct/>
+                        <ShowProduct
+                            show={ProductsStore.isShowProductWindowOpen}
+                            selected={ProductsStore.newProduct}
+                            onCloseWindow={() => ProductsStore.onCloseWindow()}
+                            categories={ProductsStore.categories}
+                        />
                     </>
                     : <CreateCategory/>
             }

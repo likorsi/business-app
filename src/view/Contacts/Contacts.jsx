@@ -9,10 +9,11 @@ import CreateContact from "./CreateContact";
 import {Loader} from "../../components/Loader/Loader";
 import Delete from "../../../public/icons/delete.svg";
 import {useLocation} from "react-router-dom";
+import Edit from "../../../public/icons/edit.svg";
 
 const Contacts = inject("ContactsStore")(observer(({ContactsStore}) => {
 
-    let location = useLocation()
+    const location = useLocation()
 
     useEffect(() => {
         console.log()
@@ -33,34 +34,38 @@ const Contacts = inject("ContactsStore")(observer(({ContactsStore}) => {
             { ContactsStore.loading
                 ? <div className='centered'><Loader/></div>
                 : ContactsStore.contacts.length > 0
-                    ? <Table responsive borderless hover style={{marginTop: 15}}>
+                    ? <Table responsive borderless style={{marginTop: 15}}>
                         <tbody>
                         <tr>
+                            <th/>
                             <th/>
                             <th>{lang.contact.name}</th>
                             <th>{lang.contact.phone}</th>
                             <th>{lang.contact.description}</th>
                         </tr>
                         { ContactsStore.contacts.map((contact, index) => (
-                            <tr
-                                key={index}
-                                onClick={() => runInAction(() => {
-                                    ContactsStore.selected = contact
-                                    ContactsStore.newContact.init(contact)
-                                    ContactsStore.isModifyWindowOpen = true
-                                })}
-                            >
-                                <td>
+                            <tr key={index} >
+                                <td style={{width: '5%'}}>
                                     <Button
                                         className='my-btn'
                                         onClick={(e) => runInAction(() => {
-                                            e.stopPropagation()
-                                            ContactsStore.selected = contact
+                                            ContactsStore.newContact.init(contact)
                                             ContactsStore.isDeleteWindowOpen = true
                                         })}
                                         variant="light"
                                         size='sm'
                                     ><Delete/></Button>
+                                </td>
+                                <td style={{width: '5%', paddingRight: 10}}>
+                                    <Button
+                                        className='my-btn'
+                                        onClick={(e) => runInAction(async () => {
+                                            ContactsStore.newContact.init(contact)
+                                            ContactsStore.isModifyWindowOpen = true
+                                        })}
+                                        variant="light"
+                                        size='sm'
+                                    ><Edit/></Button>
                                 </td>
                                 <td>{contact.name}</td>
                                 <td>
@@ -71,7 +76,7 @@ const Contacts = inject("ContactsStore")(observer(({ContactsStore}) => {
                                         {contact.phone}
                                     </a>
                                 </td>
-                                {contact.description ? <td>{contact.description}</td> : <td>&ndash;</td>}
+                                {contact.description ? <td>{contact.description.split('\n').map((row, index) => <span key={index}>{row}<br/></span>)}</td> : <td>&ndash;</td>}
                             </tr>
                             ))}
                         </tbody>
@@ -94,7 +99,7 @@ const Contacts = inject("ContactsStore")(observer(({ContactsStore}) => {
                 onClose={() => ContactsStore.onCloseWindow()}
                 onSubmit={() => ContactsStore.onDeleteContact()}
             >
-                {`Вы действительно хотите удалить контакт "${ContactsStore.selected?.name}"?`}
+                {`Вы действительно хотите удалить контакт "${ContactsStore.newContact?.name}"?`}
             </ModalWindow>
 
             <CreateContact/>

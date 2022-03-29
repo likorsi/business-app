@@ -1,0 +1,9 @@
+<svg width="20" height="20" class="icon" viewBox="0 0 24 24" >
+    <style>
+        path {
+        stroke: currentColor;
+        }
+    </style>
+    <path fill="currentColor" d="M17,10a7,7,0,1,1-7-7A7,7,0,0,1,17,10Zm4,11-6-6" style="fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1;">
+    </path>
+</svg>

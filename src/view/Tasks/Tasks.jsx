@@ -12,7 +12,7 @@ import ModalWindow from "../../components/ModalWindow";
 
 const Tasks = inject('TasksStore')(observer(({TasksStore}) => {
 
-    let location = useLocation()
+    const location = useLocation()
 
     useEffect(() => {
         location.pathname === '/tasks' && TasksStore.onInit()
@@ -63,7 +63,7 @@ const Tasks = inject('TasksStore')(observer(({TasksStore}) => {
                                     await TasksStore.onModifyTask()
                                 })}
                             >
-                                <td style={{width: '10%'}}>
+                                <td style={{width: '5%'}}>
                                     <Button
                                         className='my-btn'
                                         onClick={(e) => runInAction(() => {
@@ -76,7 +76,7 @@ const Tasks = inject('TasksStore')(observer(({TasksStore}) => {
                                     ><Delete/></Button>
 
                                 </td>
-                                <td style={{width: '10%'}}>
+                                <td style={{width: '5%', paddingRight: 10}}>
                                     <Button
                                         className='my-btn'
                                         onClick={(e) => runInAction(async () => {

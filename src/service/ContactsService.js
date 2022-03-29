@@ -56,14 +56,16 @@ class ContactsService {
     }
 
     updateContacts = data => {
-        this.contacts = Object.keys(data).map((key) => {
-            const contact = new Contact()
-            contact.init({
-                id: key,
-                ...data[key],
+        this.contacts = Object.keys(data)
+            .map((key) => {
+                const contact = new Contact()
+                contact.init({
+                    id: key,
+                    ...data[key],
+                })
+                return contact
             })
-            return contact
-        })
+            .sort((a, b) => a.name > b.name ? 1 : (a.name < b.name ? -1 : 0))
     }
 
     loadContacts = async () => {

@@ -57,6 +57,7 @@ class TasksStore {
 
 
     onInit = async () => {
+        this.isShowToast = false
         this.loading = true
         await TasksService.loadTasks()
         this.tasks = TasksService.getTasks()

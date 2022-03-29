@@ -3,6 +3,7 @@ import {getDatabase, child, get, push, remove, ref as refDB, onValue, update} fr
 import {getAuth} from "firebase/auth";
 import {Product} from "../domain/Product";
 import {Category} from "../domain/Category";
+import {Photo} from "../domain/Photo";
 
 class ProductsService {
 
@@ -25,17 +26,15 @@ class ProductsService {
             }
         });
 
-        onValue(refDB(this.db, `${this.startUrl}/products`), async snapshot => {
+        onValue(refDB(this.db, `${this.startUrl}/products`),  snapshot => {
             if (snapshot.exists()) {
-                snapshot.val() && (await this.updateProducts(snapshot.val()))
+                snapshot.val() && this.updateProducts(snapshot.val())
             } else {
                 this.products = []
                 console.log("No data available (products)");
             }
         });
     }
-
-    sleep = time => new Promise(r => setTimeout(r, time))
 
     getError = () => this.error
 
@@ -88,26 +87,21 @@ class ProductsService {
 
     getProducts = () => this.products
 
-    updateProducts = async data => {
-        this.products = await Promise.all(Object.keys(data).map(async key => {
-            const listImages = await list(ref(this.storage, `${this.startUrl}/${key}`))
-
-            let images = listImages.items.map(async item => {
-                const src = await getDownloadURL(ref(this.storage, item.fullPath))
-                return {src, name: item.name, path: item.fullPath}
-            })
-
-            images = await Promise.all(images)
-
+    updateProducts = data => {
+        this.products = Object.keys(data).map(key => {
             const product = new Product()
             product.init({
                 id: key,
                 ...data[key],
                 category: this.categories.find(({id}) => id === data[key].category)?.id || '0',
-                images
+                images: data[key].images?.map(img => {
+                    const newImg = new Photo()
+                    newImg.init(img)
+                    return newImg
+                })
             })
             return product
-        }))
+        })
         this.products = [...this.products.reverse()]
     }
 
@@ -115,7 +109,7 @@ class ProductsService {
         try {
             this.error = null
             const snapshot = await get(child(refDB(this.db), `${this.startUrl}/products`))
-            snapshot.val() && (await this.updateProducts(snapshot.val()))
+            snapshot.val() && this.updateProducts(snapshot.val())
         } catch (e) {
             this.error = e
         }
@@ -127,6 +121,29 @@ class ProductsService {
 
             const key = product.id || push(child(refDB(this.db), `${this.startUrl}/products`)).key;
 
+            let imageList = []
+
+            if (product.isImagesModified) {
+
+                const promise = product.imagesOld?.map(async file => {
+                    await deleteObject(ref(this.storage, file.fullPath))
+                })
+
+                await Promise.all(promise)
+
+                imageList = product.images?.map(async file => {
+                    const storageRef = ref(this.storage, `${localStorage.getItem('userId')}/${key}/${file.name}`);
+                    await uploadBytes(storageRef, file)
+                    const src = await getDownloadURL(ref(getStorage(), storageRef.fullPath))
+
+                    return {src: src, fullPath: storageRef.fullPath, name: storageRef.name}
+                })
+
+                imageList = await Promise.all(imageList)
+            } else {
+                imageList = product.images.map(img => img.getPhotoToLoad())
+            }
+
             await update(refDB(this.db, `${this.startUrl}/products/${key}`), {
                 name: product.name,
                 category: product.category || '',
@@ -134,24 +151,11 @@ class ProductsService {
                 badge: product.badge || '',
                 description: product.description || '',
                 options: product.options,
-                edit: new Date().toISOString()
+                edit: new Date().toISOString(),
+                images: imageList
             });
 
-            if (product.isImagesModified) {
-                product.imagesOld?.map(async file => {
-                    await deleteObject(ref(this.storage, file.path))
-                })
-
-                product.images?.map(async file => {
-                    const storageRef = ref(this.storage, `${localStorage.getItem('userId')}/${key}/${file.name}`);
-                    await uploadBytes(storageRef, file)
-                })
-            }
-
-            await this.loadProducts()
-
         } catch (e) {
-            console.log(e)
             this.error = e
         }
     }
@@ -162,7 +166,7 @@ class ProductsService {
             await remove(refDB(this.db, `${this.startUrl}/products/${id}`));
 
             images?.map(async file => {
-                await deleteObject(ref(this.storage, file.path))
+                await deleteObject(ref(this.storage, file.fullPath))
             })
         } catch (e) {
             this.error = e

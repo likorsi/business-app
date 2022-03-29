@@ -7,10 +7,13 @@ import {lang} from "../../lang";
 
 const ProductsToolbar = inject("ProductsStore")(observer(({ProductsStore}) => (
         <Stack direction="horizontal" gap={4} style={{flexWrap: 'wrap'}}>
-            <Form.Select style={{maxWidth: 180}} onChange={e => runInAction(() => {
-                ProductsStore.filters.sorting = e.target.value
-                ProductsStore.filterProducts()
-            })}>
+            <Form.Select
+                style={{maxWidth: 180, cursor: 'pointer'}}
+                onChange={e => runInAction(() => {
+                    ProductsStore.filters.sorting = e.target.value
+                    ProductsStore.filterProducts()
+                })}
+            >
                 <option value={null}>{lang.sorting.default}</option>
                 <option value="az">{lang.sorting.AZ}</option>
                 <option value="za">{lang.sorting.ZA}</option>
@@ -19,6 +22,7 @@ const ProductsToolbar = inject("ProductsStore")(observer(({ProductsStore}) => (
                 <Multiselect
                     style={{padding: 10}}
                     items={ProductsStore.categories}
+                    untitledItem={lang.noCategory}
                     onDelete={item => runInAction(() => {
                         ProductsStore.selected = item
                         ProductsStore.isDeleteWindowOpen = true

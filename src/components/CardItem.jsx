@@ -1,27 +1,26 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import PropTypes from 'prop-types';
-import {Badge, Button, Card, Carousel, Image, Spinner, Stack} from "react-bootstrap";
+import {Badge, Button, ButtonGroup, Card, Carousel, Image, Stack} from "react-bootstrap";
 import Delete from '../../public/icons/delete.svg';
 import Edit from '../../public/icons/edit.svg';
 import Ruble from '../../public/icons/ruble.svg';
 import EmptyCard from '../../public/icons/emptyCard.svg';
 import {lang} from "../lang";
 
-const CardItem = ({img, price, title, badge, onEdit, onDelete, onCardClick, onAddToCart}) => {
-
+const CardItem = ({style, img, price, title, badge, onEdit, onDelete, onCardClick, onAddToCart, onRemoveFromCart, productCountInCart}) => {
     return (
-        <Card style={{minHeight: 350}}>
+        <Card style={{minHeight: 350, ...style}}>
             <Carousel interval={null} controls={img.length > 1}>
                 {
                     img.length !== 0 ?
-                        img.map( ({src}, index) => (
+                        img.map( (item, index) => (
                             <Carousel.Item key={index}>
                                 <Image
                                     fluid={true}
                                     style={{height: 150}}
                                     alt=''
                                     className="d-block w-100"
-                                    src={src}
+                                    src={item.src}
                                 />
                             </Carousel.Item>
                         ))
@@ -31,7 +30,7 @@ const CardItem = ({img, price, title, badge, onEdit, onDelete, onCardClick, onAd
             </Carousel>
 
             <Card.Body
-                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}
+                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}
             >
                 <div onClick={() => onCardClick && onCardClick()}>
                     <Card.Title>
@@ -43,25 +42,59 @@ const CardItem = ({img, price, title, badge, onEdit, onDelete, onCardClick, onAd
                     </Stack>
                 </div>
                 <Stack direction="horizontal" gap={3}>
-                    <Button
-                        onClick={() => onAddToCart()}
-                        variant="outline-success"
-                        size='sm'
-                    >
-                        {lang.addToCart}
-                    </Button>
-                    <Button
-                        onClick={() => onEdit()}
-                        variant="light"
-                        size='sm'
-                        className='ms-auto my-btn'
-                    ><Edit/></Button>
-                    <Button
-                        className='my-btn'
-                        onClick={() => onDelete()}
-                        variant="light"
-                        size='sm'
-                    ><Delete/></Button>
+                    { onAddToCart &&
+                        <ButtonGroup style={{width: '100%'}}>
+                            { productCountInCart > 0 &&
+                                <Button
+                                    onClick={() => onRemoveFromCart()}
+                                    variant="outline-danger"
+                                    size='sm'
+                                    style={{width: '20%'}}
+                                >
+                                    -
+                                </Button>
+                            }
+                            <Button
+                                onClick={() => onAddToCart()}
+                                variant="outline-success"
+                                size='sm'
+                                style={{width: '100%'}}
+                            >
+                                { productCountInCart > 0 ? lang.productsInCart + productCountInCart : lang.addToCart}
+                            </Button>
+                            { productCountInCart > 0 &&
+                                <Button
+                                    onClick={() => onAddToCart()}
+                                    variant="outline-success"
+                                    size='sm'
+                                    style={{width: '20%'}}
+                                >
+                                    +
+                                </Button>
+                            }
+                        </ButtonGroup>
+
+                    }
+                    { onEdit &&
+                        <Button
+                            onClick={() => onEdit()}
+                            variant="light"
+                            size='sm'
+                            className='ms-auto my-btn'
+                        >
+                            <Edit/>
+                        </Button>
+                    }
+                    { onDelete &&
+                        <Button
+                            className='my-btn'
+                            onClick={() => onDelete()}
+                            variant="light"
+                            size='sm'
+                        >
+                            <Delete/>
+                        </Button>
+                    }
                 </Stack>
             </Card.Body>
         </Card>
@@ -69,13 +102,16 @@ const CardItem = ({img, price, title, badge, onEdit, onDelete, onCardClick, onAd
 
 CardItem.propTypes = {
     img: PropTypes.array,
+    style: PropTypes.object,
     price: PropTypes.string,
     title: PropTypes.string,
     badge: PropTypes.string,
     onEdit: PropTypes.func,
     onDelete: PropTypes.func,
     onCardClick: PropTypes.func,
-    onAddToCart: PropTypes.func
+    onAddToCart: PropTypes.func,
+    onRemoveFromCart: PropTypes.func,
+    productCountInCart: PropTypes.number
 }
 
 export default CardItem

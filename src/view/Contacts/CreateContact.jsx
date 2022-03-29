@@ -7,7 +7,7 @@ import {runInAction} from "mobx";
 
 const CreateContact = inject("ContactsStore")(observer(({ContactsStore}) => (
     <ModalWindow
-        title={ContactsStore.selected ? ContactsStore.selected?.name : lang.createContact}
+        title={ContactsStore.newContact.id ? ContactsStore.newContact.name : lang.createContact}
         submitText={lang.saveText}
         submitType='outline-info'
         disableSave={!ContactsStore.newContact.checkRequiredFields()}

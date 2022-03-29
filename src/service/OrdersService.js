@@ -6,6 +6,7 @@ import {Order} from "../domain/Order";
 class OrdersService {
     constructor() {
         this.orders = []
+        this.ordersCount = []
         this.error = null
         this.auth = getAuth()
         this.db = getDatabase()
@@ -32,9 +33,24 @@ class OrdersService {
 
             const key = order.id || push(child(refDB(this.db), `${this.startUrl}/orders`)).key;
 
-            await update(refDB(this.db, `${this.startUrl}/orders/${key}`), {
+            const values = {
                 name: order.name,
-            });
+                amount: order.amount,
+                products: order.products,
+                status: order.status,
+                edit: new Date(),
+            }
+
+            if (!order.id) {
+                values['create'] = new Date()
+            }
+
+            const updates = {}
+            updates[`${this.startUrl}/orders/${key}`] = values
+            updates[`${this.startUrl}/orders`] = {ordersCount: this.ordersCount + 1}
+
+            // await update(refDB(this.db, `${this.startUrl}/orders/${key}`), values);
+            await update(refDB(this.db), updates)
 
         } catch (e) {
             this.error = e
@@ -53,7 +69,8 @@ class OrdersService {
     }
 
     updateOrders = data => {
-        this.orders = Object.keys(data).map((key) => {
+        this.ordersCount = data['ordersCount']
+        this.orders = Object.keys(data['data']).map((key) => {
             const order = new Order()
             order.init({
                 id: key,

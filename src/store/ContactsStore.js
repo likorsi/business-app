@@ -20,12 +20,10 @@ class ContactsStore {
 
     @observable contacts = []
     @observable newContact = new Contact()
-    @observable selected = null
 
     @action onCloseWindow = () => {
         this.isDeleteWindowOpen = false
         this.isModifyWindowOpen = false
-        this.selected = null
         this.newContact.clear()
     }
 
@@ -46,7 +44,7 @@ class ContactsStore {
     }
 
     @action onDeleteContact = async () => {
-        await ContactsService.deleteContact(this.selected.id)
+        await ContactsService.deleteContact(this.newContact.id)
         this.error = ContactsService.getError()
         this.toastText = this.error ? lang.errorDeleteContact : lang.successDeleteContact
         this.isShowToast = true
@@ -57,6 +55,7 @@ class ContactsStore {
     }
 
     @action onInit = async () => {
+        this.isShowToast = false
         this.loading = true
         await ContactsService.loadContacts()
         this.contacts = ContactsService.getContacts()

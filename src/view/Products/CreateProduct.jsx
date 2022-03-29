@@ -13,6 +13,7 @@ const CreateProduct = inject("ProductsStore")(observer(({ProductsStore}) => (
             submitText={lang.saveText}
             submitType='outline-info'
             disableSave={!ProductsStore.newProduct.checkRequiredFields()}
+            loading={ProductsStore.loadingNewProduct}
             show={ProductsStore.isModifyProductWindowOpen}
             onClose={() => ProductsStore.onCloseWindow()}
             onSubmit={() => ProductsStore.onModifyProduct()}
@@ -21,6 +22,7 @@ const CreateProduct = inject("ProductsStore")(observer(({ProductsStore}) => (
                 <Form.Group className="mb-3">
                     <Form.Label><div className='required'/>{lang.product.name}</Form.Label>
                     <Form.Control
+                        disabled={ProductsStore.loadingNewProduct}
                         type="text"
                         value={ProductsStore.newProduct?.name}
                         onChange={event => runInAction(() => (ProductsStore.newProduct.name = event.target.value))}
@@ -29,6 +31,7 @@ const CreateProduct = inject("ProductsStore")(observer(({ProductsStore}) => (
                 <Form.Group className="mb-3">
                     <Form.Label>{lang.product.category}</Form.Label>
                     <Form.Select
+                        disabled={ProductsStore.loadingNewProduct}
                         required
                         value={ProductsStore.newProduct?.category}
                         onChange={event => runInAction(() => (ProductsStore.newProduct.category = event.target.value))}
@@ -44,6 +47,7 @@ const CreateProduct = inject("ProductsStore")(observer(({ProductsStore}) => (
                     <InputGroup>
                         <InputGroup.Text><Money/></InputGroup.Text>
                         <Form.Control
+                            disabled={ProductsStore.loadingNewProduct}
                             type="number"
                             value={ProductsStore.newProduct?.price}
                             onChange={event => runInAction(() => (ProductsStore.newProduct.price = event.target.value))}
@@ -55,6 +59,7 @@ const CreateProduct = inject("ProductsStore")(observer(({ProductsStore}) => (
                     <p className='hint'>{lang.imagesHint}</p>
                     <Form.Control
                         type="file"
+                        disabled={ProductsStore.loadingNewProduct}
                         multiple
                         onChange={event => ProductsStore.checkImages([...event.target.files])}
                     />
@@ -64,6 +69,7 @@ const CreateProduct = inject("ProductsStore")(observer(({ProductsStore}) => (
                         <Button
                             variant="outline-danger"
                             size='sm'
+                            disabled={ProductsStore.loadingNewProduct}
                             style={{marginBottom: 10}}
                             onClick={() => ProductsStore.clearImages()}>
                             { lang.removeImages }
@@ -79,6 +85,7 @@ const CreateProduct = inject("ProductsStore")(observer(({ProductsStore}) => (
                 <Form.Group className="mb-3">
                     <Form.Label>{lang.product.badge}</Form.Label>
                     <Form.Control
+                        disabled={ProductsStore.loadingNewProduct}
                         type="text"
                         value={ProductsStore.newProduct?.badge}
                         onChange={event => runInAction(() => (ProductsStore.newProduct.badge = event.target.value))}
@@ -87,6 +94,7 @@ const CreateProduct = inject("ProductsStore")(observer(({ProductsStore}) => (
                 <Form.Group className="mb-3">
                     <Form.Label>{lang.product.description}</Form.Label>
                     <Form.Control
+                        disabled={ProductsStore.loadingNewProduct}
                         as="textarea"
                         value={ProductsStore.newProduct?.description}
                         onChange={event => runInAction(() => (ProductsStore.newProduct.description = event.target.value))}
@@ -96,6 +104,7 @@ const CreateProduct = inject("ProductsStore")(observer(({ProductsStore}) => (
                     <Form.Label>{lang.product.options}</Form.Label>
                     <br/>
                     <Options
+                        loading={ProductsStore.loadingNewProduct}
                         defaultOptions={ProductsStore.newProduct.options}
                         onChange={options => runInAction(() => (ProductsStore.newProduct.options = options))}
                     />

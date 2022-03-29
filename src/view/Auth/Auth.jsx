@@ -43,23 +43,24 @@ const Auth = inject("AuthStore")(observer(({AuthStore}) => {
 				{
 					AuthStore.error ? <div className={styles.error}>{lang.signInError}</div> : null
 				}
-				<Stack direction='horizontal'>
+				<Stack direction='horizontal' style={{flexWrap: 'wrap'}}>
 					<Button
-						variant='light'
+						style={{marginBottom: 5}}
+						variant='outline-info'
 						onClick={() => handleSubmit(true)}
 						disabled={!AuthStore.isFormValid}
 					>
 						{lang.signIn}
 					</Button>
 					<Button
-						variant='light'
+						style={{marginBottom: 5}}
+						variant='outline-info'
 						onClick={() => handleSubmit(false)}
 						disabled={!AuthStore.isFormValid}
 					>
 						{lang.signUp}
 					</Button>
 					<Button
-						className='ms-auto'
 						variant='light'
 						onClick={() => AuthStore.onResetPassword()}
 						disabled={!AuthStore.email.valid}

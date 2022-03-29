@@ -3,27 +3,32 @@ import PropTypes from "prop-types";
 import {lang} from "../lang";
 import {Button, Form, Stack} from "react-bootstrap";
 
-const Multiselect = ({style, items, checked, onChange, onDelete, onEdit}) => (
+const Multiselect = ({style, items, checked, onChange, onDelete, onEdit, untitledItem}) => (
     <div style={style || {}}>
         <Form.Check
             style={{paddingBottom: 5}}
             type="checkbox"
-            checked={items.length + 1 === checked.length}
+            checked={items.length + (untitledItem ? 1 : 0) === checked.length}
             label={lang.checkAll}
             onChange={(event) =>
-                onChange(event.target.checked ? items.map(item => item.id).concat('0') : [])
+                onChange(event.target.checked
+                    ? untitledItem ? items.map(item => item.id).concat('0') : items.map(item => item.id)
+                    : []
+                )
             }
         />
-        <Form.Check
-            style={{paddingBottom: 5}}
-            type="checkbox"
-            value={'0'}
-            checked={checked.includes('0')}
-            label={lang.noCategory}
-            onChange={(event) =>
-                onChange(!checked.includes(event.target.value) ? [...checked, event.target.value] : checked.filter(item => item !== event.target.value))
-            }
-        />
+        { untitledItem &&
+            <Form.Check
+                style={{paddingBottom: 5}}
+                type="checkbox"
+                value={'0'}
+                checked={checked.includes('0')}
+                label={untitledItem}
+                onChange={(event) =>
+                    onChange(!checked.includes(event.target.value) ? [...checked, event.target.value] : checked.filter(item => item !== event.target.value))
+                }
+            />
+        }
         { items.map(item => {
             return (
                 <div key={item.id}>
@@ -72,7 +77,8 @@ Multiselect.propTypes = {
     checked: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired,
     onDelete: PropTypes.func,
-    onEdit: PropTypes.func
+    onEdit: PropTypes.func,
+    untitledItem: PropTypes.string
 }
 
 export default Multiselect

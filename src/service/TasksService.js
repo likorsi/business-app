@@ -54,14 +54,17 @@ class TasksService {
     }
 
     updateTasks = data => {
-        this.tasks = Object.keys(data).map((key) => {
-            const task = new Task()
-            task.init({
-                id: key,
-                ...data[key],
+        this.tasks = Object.keys(data)
+            .map((key) => {
+                const task = new Task()
+                task.init({
+                    id: key,
+                    ...data[key],
+                })
+                return task
             })
-            return task
-        }).sort((a, b) => a.done - b.done)
+            .reverse()
+            .sort((a, b) => a.done - b.done)
     }
 
     loadTasks = async () => {

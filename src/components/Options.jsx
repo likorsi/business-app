@@ -3,7 +3,7 @@ import {Button, Form, InputGroup} from "react-bootstrap";
 import {lang} from "../lang";
 import PropTypes from "prop-types";
 
-const Options = ({onChange, defaultOptions}) => {
+const Options = ({onChange, defaultOptions, loading}) => {
 
     const [options, setOptions] = useState(defaultOptions || [])
     const [name, setName] = useState('')
@@ -29,12 +29,14 @@ const Options = ({onChange, defaultOptions}) => {
                 </Button>
                 <Form.Control
                     placeholder={lang.product.name}
+                    disabled={loading}
                     type='text'
                     value={name}
                     onChange={event => setName(event.target.value)}
                 />
                 <Form.Control
                     placeholder={lang.product.value}
+                    disabled={loading}
                     type='text'
                     value={value}
                     onChange={event => setValue(event.target.value)}
@@ -46,6 +48,7 @@ const Options = ({onChange, defaultOptions}) => {
                     <InputGroup key={index} className="mb-3">
                         <Button
                             variant="outline-danger"
+                            disabled={loading}
                             style={{width: 40}}
                             onClick={() => setOptions(options.filter(({name}) => option.name !== name))}
                         >
@@ -70,7 +73,8 @@ const Options = ({onChange, defaultOptions}) => {
 
 Options.propTypes = {
     onChange: PropTypes.func,
-    defaultOptions: PropTypes.array
+    defaultOptions: PropTypes.array,
+    loading: PropTypes.bool
 }
 
 export default Options

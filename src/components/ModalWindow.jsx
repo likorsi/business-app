@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {Button, Modal, Stack} from "react-bootstrap";
+import {Button, Modal, Spinner, Stack} from "react-bootstrap";
 import {lang} from "../lang";
 
-const ModalWindow = ({show, title, subtitle, submitType, submitText, onSubmit, onClose, children, disableSave, hideFooter, fullscreen}) => {
+const ModalWindow = ({show, title, subtitle, submitType, submitText, onSubmit, onClose, children, disableSave, hideFooter, fullscreen, loading}) => {
     return (
         <>
             <Modal
@@ -14,26 +14,43 @@ const ModalWindow = ({show, title, subtitle, submitType, submitText, onSubmit, o
                 centered
             >
                 { title?.toString() &&
-                    <Modal.Header closeButton>
+                    <Modal.Header closeButton={!loading}>
                         <Stack>
                             <Modal.Title>{title}</Modal.Title>
-                            {subtitle && <p className='hint' style={{marginTop: 10, fontSize: '1em'}}>{subtitle}</p>}
+                            {subtitle && <p className='hint' style={{marginTop: 10, marginBottom: 0}}>{subtitle}</p>}
                         </Stack>
                     </Modal.Header>
                 }
                 { children && <Modal.Body>{children}</Modal.Body> }
                 {
                     hideFooter || <Modal.Footer>
-                        <Button variant="light" onClick={() => onClose()}>
-                            { lang.rejectPromptText }
-                        </Button>
-                        <Button
-                            disabled={disableSave || false}
-                            variant={`${submitType || 'light'}`}
-                            onClick={() => onSubmit()}
-                        >
-                            { submitText || lang.saveText }
-                        </Button>
+                        {
+                            loading
+                            ? <div className="centered">
+                                    <Spinner
+                                        style={{marginRight: 5}}
+                                        as="span"
+                                        variant="info"
+                                        animation="border"
+                                        role="status"
+                                        aria-hidden="true"
+                                    />
+                                    {lang.loading}
+                                </div>
+                            : <>
+                                    <Button variant="light" onClick={() => onClose()}>
+                                        { lang.rejectPromptText }
+                                    </Button>
+                                    <Button
+                                        disabled={disableSave || false}
+                                        variant={`${submitType || 'light'}`}
+                                        onClick={() => onSubmit()}
+                                    >
+                                        {submitText || lang.saveText}
+                                    </Button>
+                                </>
+                        }
+
                     </Modal.Footer>
                 }
             </Modal>
@@ -52,7 +69,8 @@ ModalWindow.propTypes = {
     children: PropTypes.node,
     disableSave: PropTypes.bool,
     hideFooter: PropTypes.bool,
-    fullscreen: PropTypes.bool
+    fullscreen: PropTypes.bool,
+    loading: PropTypes.bool
 }
 
 export default ModalWindow
