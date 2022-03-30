@@ -6,7 +6,7 @@ export class Category {
     }
 
     id = null
-    name = null
+    name = ''
 
     init = ({id, name}) => {
         this.id = id
@@ -15,7 +15,7 @@ export class Category {
 
     clear = () => {
         this.id = null
-        this.name = null
+        this.name = ''
     }
 
     checkRequiredFields = () => !!this.name?.trim()

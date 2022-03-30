@@ -92,3 +92,8 @@ $my-box-shadow: 0 0 0 0 white;
 		object-fit: cover;
 	}
 }
+
+.wrap {
+	overflow-wrap: break-word;
+	overflow-x: clip;
+}

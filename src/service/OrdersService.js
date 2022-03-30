@@ -18,6 +18,7 @@ class OrdersService {
                 snapshot.val() && this.updateOrders(snapshot.val())
             } else {
                 this.orders = []
+                this.ordersCount = 1
                 console.log("No data available (orders)");
             }
         });
@@ -31,26 +32,42 @@ class OrdersService {
         try {
             this.error = null
 
-            const key = order.id || push(child(refDB(this.db), `${this.startUrl}/orders`)).key;
+            const key = order.id || push(child(refDB(this.db), `${this.startUrl}/orders/data`)).key;
 
             const values = {
-                name: order.name,
+                client: order.client,
                 amount: order.amount,
                 products: order.products,
                 status: order.status,
+                delivery: order.delivery,
+                address: order.delivery ? order.address : order.clearAddress(),
                 edit: new Date(),
+                orderForEntity: order.orderForEntity,
+                inn: order.inn,
+                description: order.description,
+                orderNumber: this.ordersCount,
+                receiptUrl: order.receiptUrl
             }
 
             if (!order.id) {
                 values['create'] = new Date()
             }
 
-            const updates = {}
-            updates[`${this.startUrl}/orders/${key}`] = values
-            updates[`${this.startUrl}/orders`] = {ordersCount: this.ordersCount + 1}
+            await update(refDB(this.db, `${this.startUrl}/orders/data/${key}`), values)
+            await update(refDB(this.db, `${this.startUrl}/orders`), {ordersCount: this.ordersCount})
 
-            // await update(refDB(this.db, `${this.startUrl}/orders/${key}`), values);
-            await update(refDB(this.db), updates)
+        } catch (e) {
+            this.error = e
+        }
+    }
+
+    updateStatus = async (id, status) => {
+        try {
+            this.error = null
+
+            await update(refDB(this.db, `${this.startUrl}/orders/data/${id}`), {
+                status: status
+            })
 
         } catch (e) {
             this.error = e
@@ -61,7 +78,7 @@ class OrdersService {
         try {
             this.error = null
 
-            await remove(refDB(this.db, `${this.startUrl}/orders/${id}`));
+            await remove(refDB(this.db, `${this.startUrl}/orders/data/${id}`));
 
         } catch (e) {
             this.error = e
@@ -69,15 +86,16 @@ class OrdersService {
     }
 
     updateOrders = data => {
-        this.ordersCount = data['ordersCount']
+        this.ordersCount = data['ordersCount'] + 1 || 1
+        console.log(this.ordersCount)
         this.orders = Object.keys(data['data']).map((key) => {
             const order = new Order()
             order.init({
                 id: key,
-                ...data[key],
+                ...data['data'][key],
             })
             return order
-        })
+        }).reverse()
     }
 
     loadOrders = async () => {
@@ -87,7 +105,6 @@ class OrdersService {
             snapshot.val() && this.updateOrders(snapshot.val())
         } catch (e) { this.error = e }
     }
-
 }
 
 export default new OrdersService()

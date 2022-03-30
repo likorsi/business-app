@@ -3,13 +3,12 @@ import PropTypes from 'prop-types';
 import {Badge, Button, ButtonGroup, Card, Carousel, Image, Stack} from "react-bootstrap";
 import Delete from '../../public/icons/delete.svg';
 import Edit from '../../public/icons/edit.svg';
-import Ruble from '../../public/icons/ruble.svg';
 import EmptyCard from '../../public/icons/emptyCard.svg';
 import {lang} from "../lang";
 
 const CardItem = ({style, img, price, title, badge, onEdit, onDelete, onCardClick, onAddToCart, onRemoveFromCart, productCountInCart}) => {
     return (
-        <Card style={{minHeight: 350, ...style}}>
+        <Card style={{minHeight: 350, height: '100%', ...style}}>
             <Carousel interval={null} controls={img.length > 1}>
                 {
                     img.length !== 0 ?
@@ -36,9 +35,9 @@ const CardItem = ({style, img, price, title, badge, onEdit, onDelete, onCardClic
                     <Card.Title>
                         {title}
                     </Card.Title>
-                    <Stack direction="horizontal" gap={2}>
+                    <Stack direction="horizontal" gap={2} style={{flexWrap: 'wrap'}}>
                         { badge && <><Badge pill bg="info">{badge}</Badge><br/></> }
-                        <p style={{marginTop: 10, fontSize: '1.6em'}} className='ms-auto'><Ruble/>{price}</p>
+                        <p style={{marginTop: 10, fontSize: '1.6em'}} className='ms-auto wrap'>{price} &#8381;</p>
                     </Stack>
                 </div>
                 <Stack direction="horizontal" gap={3}>

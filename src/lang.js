@@ -9,6 +9,7 @@ export const lang = {
     findText: 'Найти',
     checkAll: 'Все',
     loading: 'Загрузка...',
+    entranceText: 'Войти',
 
     // NavBar
     entrance: 'Вход',
@@ -17,7 +18,6 @@ export const lang = {
     orders: 'Заказы',
     tasks: 'Задачи',
     contacts: 'Контакты',
-    templates: 'Шаблоны',
     statistics: 'Статистика',
 
     // Auth
@@ -71,6 +71,11 @@ export const lang = {
 
     loginToMyTax: 'Вход в аккаунт приложения "Мой налог"',
     loginToMyTaxHelp: 'Введите учетные данные своего аккаунта приложения "Мой налог", чтобы автоматичнски отправлять данные о выполненных заказах и получать чеки.',
+    incomeName: 'Наименование товара/услуги для "Мой налог"',
+    incomeNameShort: 'Наименование товара/услуги',
+    incomeNameHelp: 'Номер для каждой продажи будет подставлен автоматически в соответствии с номером заказа',
+    incomeNamePlaceholder: 'Предоставление информационных услуг',
+    addIncomeName: 'Добавьте наименование товара/услуги для создания новых продаж',
 
     // Products
     noProductsWithThisFilters: 'Нет продуктов, удовлетворяющих условиям поиска',
@@ -81,6 +86,7 @@ export const lang = {
     showProductsWithBadge: 'С наклейкой',
     sorting: {
         default: 'По добавлению',
+        edit: 'По изменению',
         AZ: 'От А до Я',
         ZA: 'От Я до А',
     },
@@ -162,22 +168,44 @@ export const lang = {
     errorDeleteOrder: 'Удалить заказ не удалось',
     successDeleteOrder: 'Заказ удален',
     findOrder: 'Найти заказ',
+    findProduct: 'Найти продукт',
+    noProductsInOrder: 'Добавьте продукты в заказ',
     orderStatus: {
-        0: 'Создан',
-        1: 'Ожидает оплаты',
-        2: 'Оплачен',
-        3: 'В работе',
-        4: 'Отправлен',
-        5: 'Завершен',
-        6: 'Отменен',
+        1: 'Создан',
+        2: 'Ожидает оплаты',
+        3: 'Оплачен',
+        4: 'В работе',
+        5: 'Отправлен',
+        6: 'Завершен',
+        7: 'Отменен',
+    },
+    orderStatusColors: {
+        1: 'info',
+        2: 'warning',
+        3: 'secondary',
+        4: 'secondary',
+        5: 'secondary',
+        6: 'success',
+        7: 'danger',
     },
     order: {
-        name: 'name',
-        client: 'Покупатель',
-        products: 'Состав',
+        client: 'Заказчик',
+        products: 'Состав заказа',
         amount: 'Стоимость',
         description: 'Описание',
         orderNumber: 'Номер заказа',
         status: 'Статус',
+        deliveryPlace: 'Доставка',
+        pickup: 'Самовывоз',
+        date: 'Дата',
+        country: 'Страна',
+        city: 'Город / населенный пункт',
+        address: 'Адрес',
+        orderForEntity: 'Заказ для юридического лица или ИП',
+        inn: 'ИНН',
+        entityPlaceholder: 'Юридическое название',
+        receipt: 'Чек'
     },
+    russia: 'Россия',
+    errorInn: 'ИНН для ЮЛ содержит 10 цифр, для ИП - 12',
 }

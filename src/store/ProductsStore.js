@@ -131,7 +131,7 @@ class ProductsStore {
     }
 
     get filtersUsed() {
-        return this.filters.checkedCategories.length === this.categories.length + 1
+        return this.filters.checkedCategories.length !== this.categories.length + 1
     }
 
     @action onInit = async () => {

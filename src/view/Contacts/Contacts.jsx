@@ -37,36 +37,14 @@ const Contacts = inject("ContactsStore")(observer(({ContactsStore}) => {
                     ? <Table responsive borderless style={{marginTop: 15}}>
                         <tbody>
                         <tr>
-                            <th/>
-                            <th/>
                             <th>{lang.contact.name}</th>
                             <th>{lang.contact.phone}</th>
                             <th>{lang.contact.description}</th>
+                            <th/>
+                            <th/>
                         </tr>
                         { ContactsStore.contacts.map((contact, index) => (
-                            <tr key={index} >
-                                <td style={{width: '5%'}}>
-                                    <Button
-                                        className='my-btn'
-                                        onClick={(e) => runInAction(() => {
-                                            ContactsStore.newContact.init(contact)
-                                            ContactsStore.isDeleteWindowOpen = true
-                                        })}
-                                        variant="light"
-                                        size='sm'
-                                    ><Delete/></Button>
-                                </td>
-                                <td style={{width: '5%', paddingRight: 10}}>
-                                    <Button
-                                        className='my-btn'
-                                        onClick={(e) => runInAction(async () => {
-                                            ContactsStore.newContact.init(contact)
-                                            ContactsStore.isModifyWindowOpen = true
-                                        })}
-                                        variant="light"
-                                        size='sm'
-                                    ><Edit/></Button>
-                                </td>
+                            <tr key={index} style={{verticalAlign: 'middle'}}>
                                 <td>{contact.name}</td>
                                 <td>
                                     <a
@@ -77,6 +55,28 @@ const Contacts = inject("ContactsStore")(observer(({ContactsStore}) => {
                                     </a>
                                 </td>
                                 {contact.description ? <td>{contact.description.split('\n').map((row, index) => <span key={index}>{row}<br/></span>)}</td> : <td>&ndash;</td>}
+                                <td style={{width: '5%', marginLeft: 5}}>
+                                    <Button
+                                        className='my-btn'
+                                        onClick={(e) => runInAction(() => {
+                                            ContactsStore.newContact.init(contact)
+                                            ContactsStore.isDeleteWindowOpen = true
+                                        })}
+                                        variant="light"
+                                        size='sm'
+                                    ><Delete/></Button>
+                                </td>
+                                <td style={{width: '5%'}}>
+                                    <Button
+                                        className='my-btn'
+                                        onClick={(e) => runInAction(async () => {
+                                            ContactsStore.newContact.init(contact)
+                                            ContactsStore.isModifyWindowOpen = true
+                                        })}
+                                        variant="light"
+                                        size='sm'
+                                    ><Edit/></Button>
+                                </td>
                             </tr>
                             ))}
                         </tbody>

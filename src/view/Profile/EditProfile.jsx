@@ -114,6 +114,27 @@ const EditProfile = inject("AuthStore")(observer(({AuthStore}) => {
             </ModalWindow>
 
             <ModalWindow
+                title={lang.incomeName}
+                subtitle={lang.incomeNameHelp}
+                submitText={lang.saveText}
+                submitType='outline-info'
+                disableSave={!AuthStore.newIncomeName.trim() || AuthStore.newIncomeName.length > 255}
+                show={AuthStore.isEditIncomeNameWindowOpen}
+                onClose={() => AuthStore.onCloseWindow()}
+                onSubmit={() => AuthStore.onEditIncomeName()}
+            >
+                <Form.Group className="mb-3">
+                    <Form.Label><div className='required'/>{lang.incomeNameShort}</Form.Label>
+                    <Form.Control
+                        placeholder={lang.incomeNamePlaceholder}
+                        type="text"
+                        value={AuthStore.newIncomeName}
+                        onChange={e => runInAction(() => {AuthStore.newIncomeName = e.target.value})}
+                    />
+                </Form.Group>
+            </ModalWindow>
+
+            <ModalWindow
                 title={lang.profile.password}
                 subtitle={lang.changePasswordHelpText}
                 submitText={lang.saveText}
@@ -161,7 +182,7 @@ const EditProfile = inject("AuthStore")(observer(({AuthStore}) => {
 
             <ModalWindow
                 title={lang.loginToMyTax}
-                submitText={lang.saveText}
+                submitText={lang.entranceText}
                 submitType='outline-info'
                 disableSave={!(AuthStore.newPassword.trim() && AuthStore.newEmail.trim())}
                 show={AuthStore.isLoginToMyTaxWindowOpen}

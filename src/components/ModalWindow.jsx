@@ -14,7 +14,7 @@ const ModalWindow = ({show, title, subtitle, submitType, submitText, onSubmit, o
                 centered
             >
                 { title?.toString() &&
-                    <Modal.Header closeButton={!loading}>
+                    <Modal.Header closeButton={!loading} style={{overflowWrap: 'anywhere'}}>
                         <Stack>
                             <Modal.Title>{title}</Modal.Title>
                             {subtitle && <p className='hint' style={{marginTop: 10, marginBottom: 0}}>{subtitle}</p>}

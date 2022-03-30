@@ -26,13 +26,14 @@ class AuthService {
             storageBucket: `${process.env.STORAGE_BUCKET}.appspot.com`
         })
         this.getAuth = getAuth()
-        this.user = localStorage.getItem('userId')
-        this.token = localStorage.getItem('token')
+        this.startUrl = localStorage.getItem('userId') || ''
+        this.token = localStorage.getItem('token') || ''
         this.error = null
         this.profile = null
         this.nalogInfo = {
             useMyTaxOption: false,
-            token: ''
+            token: '',
+            incomeName: ''
         }
         this.publicInfo = {
             username: '',
@@ -47,12 +48,11 @@ class AuthService {
 
             } else {
                 await this.logout()
-                localStorage.removeItem('token')
                 console.log('User is signed out')
             }
         });
 
-        onValue(refDB(getDatabase(), `${localStorage.getItem('userId')}/info`), snapshot => {
+        onValue(refDB(getDatabase(), `${this.startUrl}/info`), snapshot => {
             if (snapshot.exists()) {
                 const photo = new Photo()
                 photo.init(snapshot.val().photo)
@@ -64,7 +64,7 @@ class AuthService {
             }
         });
 
-        onValue(refDB(getDatabase(), `${localStorage.getItem('userId')}/nalog`), snapshot => {
+        onValue(refDB(getDatabase(), `${this.startUrl}/nalog`), snapshot => {
             if (snapshot.exists()) {
                 this.nalogInfo = snapshot.val()
             }
@@ -92,17 +92,17 @@ class AuthService {
             }
 
             this.token = response.user.accessToken
-            this.user = response.user.uid
             localStorage.setItem('token', this.token)
-            localStorage.setItem('userId', this.user)
-            const expirationDate = new Date(new Date().getTime() + response._tokenResponse.expiresIn * 1000)
-            localStorage.setItem('expirationDate', expirationDate)
+            localStorage.setItem('userId', response.user.uid)
+            this.startUrl = localStorage.getItem('userId')
+            // const expirationDate = new Date(new Date().getTime() + response._tokenResponse.expiresIn * 1000)
+            // localStorage.setItem('expirationDate', expirationDate)
             // this.autoLogout(response._tokenResponse.expiresIn)
 
             if (isLogin) {
-                const snapshot = await get(child(refDB(getDatabase()), `${localStorage.getItem('userId')}/nalog`))
+                const snapshot = await get(child(refDB(getDatabase()), `${this.startUrl}/nalog`))
                 this.nalogInfo = snapshot.val()
-                const snapshot2 = await get(child(refDB(getDatabase()), `${localStorage.getItem('userId')}/info`))
+                const snapshot2 = await get(child(refDB(getDatabase()), `${this.startUrl}/info`))
                 const photo = new Photo()
                 photo.init(snapshot2.val().photo)
                 this.publicInfo = {
@@ -111,7 +111,7 @@ class AuthService {
                     photo: photo
                 }
             } else {
-                await set(refDB(getDatabase(), `${localStorage.getItem('userId')}/info`), {
+                await set(refDB(getDatabase(), `${this.startUrl}/info`), {
                     username: email,
                     photo: {
                         src: '',
@@ -120,9 +120,10 @@ class AuthService {
                     },
                     helpText: ''
                 })
-                await set(refDB(getDatabase(), `${localStorage.getItem('userId')}/nalog`), {
+                await set(refDB(getDatabase(), `${this.startUrl}/nalog`), {
                     useMyTaxOption: false,
-                    token: ''
+                    token: '',
+                    incomeName: '',
                 })
             }
 
@@ -134,24 +135,17 @@ class AuthService {
         }
     }
 
-    autoLogin = async () => {
-        const token = localStorage.getItem('token')
-        if (!token) {
-            await this.logout()
-        } else {
-            const expirationDate = new Date(localStorage.getItem('expirationDate'))
-            if (expirationDate <= new Date()) {
-                await this.logout()
-            } else {
-                this.token = token
-                this.autoLogout((expirationDate.getTime() - new Date().getTime()) / 1000)
-            }
-        }
-    }
-
-    autoLogout = (time) => {
-        // setTimeout(() => this.logout(), time * 10000)
-    }
+    // autoLogin = async () => {
+    //     const token = localStorage.getItem('token')
+    //     if (!token) {
+    //         await this.logout()
+    //     } else {
+    //         const expirationDate = new Date(localStorage.getItem('expirationDate'))
+    //         if (expirationDate <= new Date()) {
+    //             await this.logout()
+    //         }
+    //     }
+    // }
 
     updateUsername = async (username) => {
         try {
@@ -159,7 +153,7 @@ class AuthService {
             await updateProfile(getAuth().currentUser, {
                 displayName: username
             })
-            await update(refDB(getDatabase(), `${localStorage.getItem('userId')}/info`), {
+            await update(refDB(getDatabase(), `${this.startUrl}/info`), {
                 username: username,
             })
         } catch (e) {
@@ -170,7 +164,7 @@ class AuthService {
     updateHelpText = async (text) => {
         try {
             this.error = null
-            await update(refDB(getDatabase(), `${localStorage.getItem('userId')}/info`), {
+            await update(refDB(getDatabase(), `${this.startUrl}/info`), {
                 helpText: text,
             })
         } catch (e) {
@@ -183,12 +177,12 @@ class AuthService {
             this.error = null
 
             if (photo) {
-                const storageRef = ref(getStorage(), `${localStorage.getItem('userId')}/profile/${photo.name}`);
+                const storageRef = ref(getStorage(), `${this.startUrl}/profile/${photo.name}`);
                 await uploadBytes(storageRef, photo)
 
                 const src = await getDownloadURL(ref(getStorage(), storageRef.fullPath))
 
-                await update(refDB(getDatabase(), `${localStorage.getItem('userId')}/info`), {
+                await update(refDB(getDatabase(), `${this.startUrl}/info`), {
                     photo: {
                         src: src,
                         fullPath: storageRef.fullPath,
@@ -198,7 +192,7 @@ class AuthService {
 
             } else {
                 await deleteObject(ref(getStorage(), this.publicInfo.photo.fullPath))
-                await update(refDB(getDatabase(), `${localStorage.getItem('userId')}/info`), {
+                await update(refDB(getDatabase(), `${this.startUrl}/info`), {
                     photo: {
                         src: '',
                         fullPath: '',
@@ -236,7 +230,7 @@ class AuthService {
         try {
             this.error = null
             await deleteUser(getAuth().currentUser)
-            await remove(refDB(getDatabase(), `${localStorage.getItem('userId')}`));
+            await remove(refDB(getDatabase(), `${this.startUrl}`));
         } catch (e) {
             this.error = e
         }
@@ -259,14 +253,13 @@ class AuthService {
 
             await nalog.auth(login, password)
 
-            const nalogToken = await nalog.getToken()
+            const nalogToken = nalog.token
             console.log(nalogToken)
 
-            await update(refDB(getDatabase(), `${localStorage.getItem('userId')}/nalog`), {
+            await update(refDB(getDatabase(), `${this.startUrl}/nalog`), {
                 useMyTaxOption: true,
                 token: nalogToken
             });
-            // await this.updateCheckMyTaxOption(true)
         } catch (e) {
             this.error = e
         }
@@ -275,7 +268,7 @@ class AuthService {
     resetCheckMyTaxOption = async () => {
         try {
             this.error = null
-            await update(refDB(getDatabase(), `${localStorage.getItem('userId')}/nalog`), {
+            await update(refDB(getDatabase(), `${this.startUrl}/nalog`), {
                 useMyTaxOption: false,
                 token: ''
             });
@@ -287,12 +280,24 @@ class AuthService {
     loadMyTaxOption = async () => {
         try {
             this.error = null
-            const snapshot = await get(child(refDB(getDatabase()), `${localStorage.getItem('userId')}/nalog`))
+            const snapshot = await get(child(refDB(getDatabase()), `${this.startUrl}/nalog`))
 
             if (snapshot.exists()) {
                 this.useMyTax = snapshot.val().useMyTaxOption
             }
 
+        } catch (e) {
+            this.error = e
+        }
+    }
+
+    editIncomeName = async (newIncomeName) => {
+        try {
+            this.error = null
+
+            await update(refDB(getDatabase(), `${this.startUrl}/nalog`), {
+                incomeName: newIncomeName,
+            });
         } catch (e) {
             this.error = e
         }
@@ -305,9 +310,8 @@ class AuthService {
 
             localStorage.removeItem('token')
             localStorage.removeItem('userId')
-            localStorage.removeItem('expirationDate')
+            // localStorage.removeItem('expirationDate')
             this.token = null
-            this.user = null
 
         } catch (e) { console.log(e) }
     }

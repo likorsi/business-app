@@ -62,7 +62,7 @@ const Products = inject("ProductsStore")(observer(({ProductsStore}) => {
                             </Col>
                         ))}
                     </Row>
-                    : <div className='centered'>{ProductsStore.filtersUsed ? lang.noProducts : lang.noProductsWithThisFilters}</div>
+                    : <div className='centered'>{ProductsStore.filtersUsed && ProductsStore.rawProducts.length > 0 ? lang.noProductsWithThisFilters : lang.noProducts}</div>
             }
 
             <ToastNotify

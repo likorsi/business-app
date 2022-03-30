@@ -1,7 +1,6 @@
 import React from "react";
 import ModalWindow from "../../components/ModalWindow";
 import {Badge, Button, Card, Carousel, Col, Image, Row, Table} from "react-bootstrap";
-import Ruble from "../../../public/icons/ruble.svg";
 import {lang} from "../../lang";
 import PropTypes from "prop-types";
 import {Product} from "../../domain/Product";
@@ -18,9 +17,9 @@ const ShowProduct = ({show, selected, categories, onCloseWindow, onAddToCart}) =
         >
             <Row md={1} className="g-4" style={{padding: 10}}>
                 <Col md={selected.images.length > 0 ? 4 : 8} xs={12} style={{alignSelf:'center'}}>
-                    <p style={{marginTop: 10, fontSize: '2.2em'}}><Ruble style={{width: 35, height: 35}}/>{selected.price}</p>
+                    <p style={{marginTop: 10, fontSize: '2.2em'}} className='wrap'>{selected.price} &#8381;</p>
                     { selected.badge && <div><Badge pill bg="info">{selected.badge}</Badge></div> }
-                    {
+                    { onAddToCart &&
                         <Button
                             onClick={() => onAddToCart()}
                             variant="outline-success"

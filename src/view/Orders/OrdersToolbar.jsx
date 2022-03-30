@@ -17,8 +17,7 @@ const OrdersToolbar = inject('OrdersStore')(observer(({OrdersStore}) => {
                })}
            >
                <option value={null}>{lang.sorting.default}</option>
-               <option value="az">{lang.sorting.AZ}</option>
-               <option value="za">{lang.sorting.ZA}</option>
+               <option value='edit'>{lang.sorting.edit}</option>
            </Form.Select>
            <DropdownButton variant="light" title={lang.order.status}>
                <Multiselect
@@ -36,15 +35,30 @@ const OrdersToolbar = inject('OrdersStore')(observer(({OrdersStore}) => {
                    style={{width: 50}}
                    variant="outline-success"
                    disabled={!OrdersStore.filters.searchText.trim()}
-                   onClick={() => OrdersStore.filterOrders()}>
+                   onClick={() => runInAction(() => {
+                       OrdersStore.filters.searching = true
+                       OrdersStore.filterOrders()
+                   })}>
                    <Search/>
                </Button>
                <Form.Control
                    placeholder={lang.findOrder}
                    type='text'
                    value={OrdersStore.filters.searchText}
-                   onChange={event => runInAction(() => {OrdersStore.filters.searchText = event.target.value})}
+                   onChange={event => runInAction(() => {OrdersStore.filters.searchText = event.target.value.toLowerCase()})}
                />
+               { (OrdersStore.filters.searchText.trim() || OrdersStore.filters.searching) &&
+                   <Button
+                       style={{width: 50}}
+                       variant="outline-danger"
+                       onClick={() => runInAction(() => {
+                           OrdersStore.filters.searching = false
+                           OrdersStore.filters.searchText = ''
+                           OrdersStore.filterOrders()
+                       })}>
+                       <span>&#215;</span>
+                   </Button>
+               }
            </InputGroup>
        </Stack>
    )

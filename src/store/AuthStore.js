@@ -24,7 +24,8 @@ class AuthStore {
     @observable publicUrl = null
     @observable nalogInfo = {
         useMyTaxOption: false,
-        token: ''
+        token: '',
+        incomeName: ''
     }
     @observable publicInfo = {
         username: '',
@@ -50,6 +51,7 @@ class AuthStore {
     @observable newEmail = ''
     @observable newHelpText = ''
     @observable newPhoto = null
+    @observable newIncomeName = ''
 
     @observable error = null
     @observable token = null
@@ -64,6 +66,7 @@ class AuthStore {
     @observable isDeleteAccountWindowOpen = false
     @observable isResetModalWindowOpen = false
     @observable isLoginToMyTaxWindowOpen = false
+    @observable isEditIncomeNameWindowOpen = false
 
     @observable isShowToast = false
     @observable toastText = ''
@@ -98,10 +101,10 @@ class AuthStore {
         this.updateData()
     }
 
-    @action autoLogin = () => {
-        AuthService.autoLogin()
-        this.updateData()
-    }
+    // @action autoLogin = () => {
+    //     AuthService.autoLogin()
+    //     this.updateData()
+    // }
 
     validateEmail = value => {
         let re = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
@@ -142,6 +145,7 @@ class AuthStore {
         this.isDeletePhotoWindowOpen = false
         this.isResetModalWindowOpen = false
         this.isLoginToMyTaxWindowOpen = false
+        this.isEditIncomeNameWindowOpen = false
         this.email.value = ''
         this.email.touched = false
         this.email.valid = false
@@ -243,6 +247,17 @@ class AuthStore {
 
     onLoginToMyTax = async () => {
         await AuthService.loginToMyTax(this.newEmail, this.newPassword)
+        this.error = AuthService.getError()
+        this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
+        this.isShowToast = true
+        if (!this.error) {
+            this.nalogInfo = AuthService.getNalogInfo()
+            this.onCloseWindow()
+        }
+    }
+
+    onEditIncomeName = async () => {
+        await AuthService.editIncomeName(this.newIncomeName)
         this.error = AuthService.getError()
         this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
         this.isShowToast = true

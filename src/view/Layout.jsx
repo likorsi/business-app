@@ -13,7 +13,6 @@ const Layout = inject('AuthStore')(observer(({AuthStore}) => {
         {'label': lang.orders, 'to': '/orders', 'status': ''},
         {'label': lang.tasks, 'to': '/tasks', 'status': ''},
         {'label': lang.contacts, 'to': '/contacts', 'status': ''},
-        {'label': lang.templates, 'to': '/templates', 'status': 'disabled'},
         {'label': lang.statistics, 'to': '/statistics', 'status': 'disabled'},
     ]
 

@@ -63,7 +63,13 @@ const Tasks = inject('TasksStore')(observer(({TasksStore}) => {
                                     await TasksStore.onModifyTask()
                                 })}
                             >
-                                <td style={{width: '5%'}}>
+                                <td style={{cursor: "pointer"}}>
+                                    {task.done
+                                        ? <span style={{opacity: 0.7, textDecoration: 'line-through'}}>{task.task}</span>
+                                        : task.task
+                                    }
+                                </td>
+                                <td style={{width: '5%', marginLeft: 5}}>
                                     <Button
                                         className='my-btn'
                                         onClick={(e) => runInAction(() => {
@@ -76,7 +82,7 @@ const Tasks = inject('TasksStore')(observer(({TasksStore}) => {
                                     ><Delete/></Button>
 
                                 </td>
-                                <td style={{width: '5%', paddingRight: 10}}>
+                                <td style={{width: '5%'}}>
                                     <Button
                                         className='my-btn'
                                         onClick={(e) => runInAction(async () => {
@@ -87,12 +93,6 @@ const Tasks = inject('TasksStore')(observer(({TasksStore}) => {
                                         variant="light"
                                         size='sm'
                                     ><Edit/></Button>
-                                </td>
-                                <td style={{cursor: "pointer"}}>
-                                    {task.done
-                                        ? <span style={{opacity: 0.7, textDecoration: 'line-through'}}>{task.task}</span>
-                                        : task.task
-                                    }
                                 </td>
                             </tr>
                         ))}

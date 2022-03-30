@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {inject, observer} from "mobx-react";
 import {useLocation} from "react-router-dom";
-import {Button, Row, Stack} from "react-bootstrap";
+import {Button, Stack, Table, Form, Badge} from "react-bootstrap";
 import {runInAction} from "mobx";
 import {lang} from "../../lang";
 import {Loader} from "../../components/Loader/Loader";
@@ -10,6 +10,8 @@ import ModalWindow from "../../components/ModalWindow";
 import CreateOrder from "./CreateOrder";
 import ShowOrder from "./ShowOrder";
 import OrdersToolbar from "./OrdersToolbar";
+import Delete from "../../../public/icons/delete.svg";
+import Edit from "../../../public/icons/edit.svg";
 
 const Orders = inject('OrdersStore')(observer(({OrdersStore}) => {
 
@@ -30,12 +32,81 @@ const Orders = inject('OrdersStore')(observer(({OrdersStore}) => {
                 OrdersStore.loading
                     ? <div className='centered'><Loader/></div>
                     : OrdersStore.orders.length > 0
-                        ? <Row xs={1} sm={2} md={3} lg={4} xl={5} className="g-4" style={{marginTop: 10}}>
-                            {OrdersStore.orders.map(order => (
-                                <div key={order.id}>{order.id}</div>
+                        ? <Table responsive borderless style={{marginTop: 15}}>
+                            <tbody>
+                            <tr>
+                                <th>&#8470;</th>
+                                <th>{lang.order.status}</th>
+                                <th>{lang.order.amount}</th>
+                                <th>{lang.order.client}</th>
+                                <th>{lang.order.deliveryPlace}</th>
+                                <th>{lang.order.date}</th>
+                                <th/>
+                                <th/>
+                            </tr>
+                            { OrdersStore.orders.map((order, index) => (
+                                <tr
+                                    key={index}
+                                    style={{cursor: 'pointer', verticalAlign: 'middle'}}
+                                    onClick={() => runInAction(() => {
+                                        OrdersStore.newOrder.init(order)
+                                        OrdersStore.isShowWindowOpen = true
+                                    })}
+                                >
+                                    <td><Badge bg={lang.orderStatusColors[order.status]}>{order.orderNumber}</Badge></td>
+                                    <td>
+                                        <Form.Select
+                                            style={{maxWidth: 175, minWidth: 100, cursor: 'pointer'}}
+                                            value={order.status}
+                                            onClick={e => e.stopPropagation()}
+                                            onChange={e => runInAction(() => (OrdersStore.onUpdateStatus(order.id, e.target.value)))}
+                                        >
+                                            {
+                                                OrdersStore.statuses
+                                                    .map(status => (
+                                                        <option
+                                                            key={status.id}
+                                                            value={status.id}
+                                                        >
+                                                            {status.name}
+                                                        </option>
+                                                    ))
+                                            }
+                                        </Form.Select>
+                                    </td>
+                                    <td>{order.amount}</td>
+                                    <td>{order.client} {order.inn && `, ${order.inn}`}</td>
+                                    <td>{order.delivery ? `${order.address.country}, ${order.address.city}` : lang.order.pickup}</td>
+                                    <td>{OrdersStore.beautifyDate(order.dateCreate)}</td>
+                                    <td style={{width: '5%', marginLeft: 5}}>
+                                        <Button
+                                            className='my-btn'
+                                            onClick={e => runInAction(() => {
+                                                e.stopPropagation()
+                                                OrdersStore.newOrder.init(order)
+                                                OrdersStore.isDeleteWindowOpen = true
+                                            })}
+                                            variant="light"
+                                            size='sm'
+                                        ><Delete/></Button>
+                                    </td>
+                                    <td style={{width: '5%'}}>
+                                        <Button
+                                            className='my-btn'
+                                            onClick={e => runInAction(async () => {
+                                                e.stopPropagation()
+                                                OrdersStore.newOrder.init(order)
+                                                OrdersStore.isModifyWindowOpen = true
+                                            })}
+                                            variant="light"
+                                            size='sm'
+                                        ><Edit/></Button>
+                                    </td>
+                                </tr>
                             ))}
-                        </Row>
-                        : <div className='centered'>{OrdersStore.filtersUsed ? lang.noOrders : lang.noOrdersWithThisFilters}</div>
+                            </tbody>
+                        </Table>
+                        : <div className='centered'>{OrdersStore.filtersUsed && OrdersStore.rawOrders.length > 0 ? lang.noOrdersWithThisFilters : lang.noOrders}</div>
             }
 
             <ToastNotify
@@ -46,14 +117,14 @@ const Orders = inject('OrdersStore')(observer(({OrdersStore}) => {
             />
 
             <ModalWindow
-                title={lang.deleteProduct}
+                title={lang.deleteOrder}
                 submitText={lang.deletePromptText}
                 submitType='outline-danger'
                 show={OrdersStore.isDeleteWindowOpen}
                 onClose={() => OrdersStore.onCloseWindow()}
                 onSubmit={() => OrdersStore.onDeleteOrder()}
             >
-                {`Вы действительно хотите удалить заказ №"${OrdersStore.newOrder.orderNumber}"?`}
+                {`Вы действительно хотите удалить заказ №${OrdersStore.newOrder.orderNumber}?`}
             </ModalWindow>
 
             <CreateOrder/>

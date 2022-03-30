@@ -19,7 +19,7 @@ const CreateCategory = inject("ProductsStore")(observer(({ProductsStore}) => (
             <Form.Label><div className='required'/>{lang.category.name}</Form.Label>
             <Form.Control
                 type="text"
-                value={ProductsStore.newCategory?.name || ''}
+                value={ProductsStore.newCategory?.name}
                 onChange={event => runInAction(() => (ProductsStore.newCategory.name = event.target.value))}
             />
         </Form.Group>

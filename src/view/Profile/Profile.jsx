@@ -83,6 +83,26 @@ const Profile = inject("AuthStore")(observer(({AuthStore}) => {
                         })}
                     />
 
+                    {
+                        AuthStore.nalogInfo.useMyTaxOption &&
+                        <><Stack direction='horizontal'>
+                            <Card.Subtitle>{lang.incomeName}</Card.Subtitle>
+                            <Button
+                                style={{marginBottom: 4}}
+                                onClick={() => runInAction(() => {
+                                    AuthStore.newIncomeName = AuthStore.nalogInfo.incomeName || ''
+                                    AuthStore.isEditIncomeNameWindowOpen = true
+                                })}
+                                variant="light"
+                                size='sm'
+                                className='my-btn'
+                            >
+                                <Edit/>
+                            </Button>
+                        </Stack>
+                        <Card.Text>{AuthStore.nalogInfo.incomeName || <p className="hint-warning">{lang.addIncomeName}</p>}</Card.Text></>
+                    }
+
                     <Stack direction='horizontal'>
                         <Card.Subtitle>{lang.profile.email}</Card.Subtitle>
                         <Button

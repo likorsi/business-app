@@ -18,9 +18,12 @@ const ProductsToolbar = inject("ProductsStore")(observer(({ProductsStore}) => (
                 <option value="az">{lang.sorting.AZ}</option>
                 <option value="za">{lang.sorting.ZA}</option>
             </Form.Select>
-            <DropdownButton variant="light" title={lang.categories}>
+            <DropdownButton
+                variant="light"
+                title={lang.categories}
+            >
                 <Multiselect
-                    style={{padding: 10}}
+                    style={{padding: 10, maxHeight: 200}}
                     items={ProductsStore.categories}
                     untitledItem={lang.noCategory}
                     onDelete={item => runInAction(() => {

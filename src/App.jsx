@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {Route, Routes, useNavigate} from "react-router-dom";
+import React from 'react';
+import {Route, Routes} from "react-router-dom";
 import {inject, observer} from "mobx-react";
 import Auth from "./view/Auth/Auth";
 import Home from "./view/Home/Home";
@@ -15,11 +15,11 @@ import PublicCatalog from "./view/Public/PublicCatalog";
 
 const App = inject('AuthStore')(observer(({AuthStore}) => {
 
-    let navigate = useNavigate();
+    // let navigate = useNavigate();
 
-    useEffect(() => {
-        // !AuthStore.token && navigate('/')
-    }, [AuthStore.token])
+    // useEffect(() => {
+    //     // !AuthStore.token && navigate('/')
+    // }, [AuthStore.token])
 
     return (
         <Routes>

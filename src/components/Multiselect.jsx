@@ -4,7 +4,7 @@ import {lang} from "../lang";
 import {Button, Form, Stack} from "react-bootstrap";
 
 const Multiselect = ({style, items, checked, onChange, onDelete, onEdit, untitledItem}) => (
-    <div style={style || {}}>
+    <div style={style || {}} className='overflow-auto'>
         <Form.Check
             style={{paddingBottom: 5}}
             type="checkbox"
