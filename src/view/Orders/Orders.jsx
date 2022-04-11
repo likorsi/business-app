@@ -3,22 +3,23 @@ import {inject, observer} from "mobx-react";
 import {useLocation} from "react-router-dom";
 import {Button, Stack, Table, Form, Badge} from "react-bootstrap";
 import {runInAction} from "mobx";
-import {lang} from "../../lang";
 import {Loader} from "../../components/Loader/Loader";
 import ToastNotify from "../../components/ToastNotify";
 import ModalWindow from "../../components/ModalWindow";
 import CreateOrder from "./CreateOrder";
 import ShowOrder from "./ShowOrder";
 import OrdersToolbar from "./OrdersToolbar";
+import IncomeActions from "./IncomeActions";
 import Delete from "../../../public/icons/delete.svg";
 import Edit from "../../../public/icons/edit.svg";
+import {lang} from "../../lang";
 
 const Orders = inject('OrdersStore')(observer(({OrdersStore}) => {
 
     const location = useLocation()
 
     useEffect(() => {
-        location.pathname === '/orders' && OrdersStore.onInit()
+        location.pathname.startsWith('/orders') && OrdersStore.onInit()
     }, [location.pathname])
 
     return (
@@ -127,6 +128,7 @@ const Orders = inject('OrdersStore')(observer(({OrdersStore}) => {
                 {`Вы действительно хотите удалить заказ №${OrdersStore.newOrder.orderNumber}?`}
             </ModalWindow>
 
+            <IncomeActions/>
             <CreateOrder/>
             <ShowOrder/>
 

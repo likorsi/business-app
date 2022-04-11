@@ -1,4 +1,4 @@
-import {getDownloadURL, getStorage, list, ref, uploadBytes, deleteObject} from "firebase/storage";
+import {getDownloadURL, getStorage, ref, uploadBytes, deleteObject} from "firebase/storage";
 import {getDatabase, child, get, push, remove, ref as refDB, onValue, update} from "firebase/database";
 import {getAuth} from "firebase/auth";
 import {Product} from "../domain/Product";
@@ -22,7 +22,6 @@ class ProductsService {
                 snapshot.val() && this.updateCategories(snapshot.val())
             } else {
                 this.categories =[]
-                console.log("No data available (categories)");
             }
         });
 
@@ -31,7 +30,6 @@ class ProductsService {
                 snapshot.val() && this.updateProducts(snapshot.val())
             } else {
                 this.products = []
-                console.log("No data available (products)");
             }
         });
     }
@@ -67,14 +65,17 @@ class ProductsService {
     }
 
     updateCategories = data => {
-        this.categories = Object.keys(data).map((key) => {
-            const category = new Category()
-            category.init({
-                id: key,
-                name: data[key].name
+        this.categories = Object.keys(data)
+            .map((key) => {
+                const category = new Category()
+                category.init({
+                    id: key,
+                    name: data[key].name
+                })
+                return category
             })
-            return category
-        })
+            .sort((a, b) => a.name > b.name ? 1 : (a.name < b.name ? -1 : 0))
+
     }
 
     loadCategories = async () => {
@@ -149,6 +150,7 @@ class ProductsService {
                 category: product.category || '',
                 price: product.price,
                 badge: product.badge || '',
+                notAvailable: product.notAvailable,
                 description: product.description || '',
                 options: product.options,
                 edit: new Date().toISOString(),

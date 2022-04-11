@@ -3,8 +3,6 @@
 $danger: deeppink;
 $success: #3ad166;
 
-
-
 /* import bootstrap to set changes */
 @import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 @import "~bootstrap/scss/bootstrap";
@@ -43,12 +41,20 @@ $my-box-shadow: 0 0 0 0 white;
 	width: 100%;
 }
 
+.fixed-toast {
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	z-index: 40000;
+	max-width: 250px
+}
+
 .hint {
 	opacity: 0.7;
-	//font-size: 0.8em;
 
 	&-warning {
 		@extend .hint;
+		font-size: 0.9em;
 		color: $danger;
 	}
 }
@@ -96,4 +102,20 @@ $my-box-shadow: 0 0 0 0 white;
 .wrap {
 	overflow-wrap: break-word;
 	overflow-x: clip;
+}
+
+.title {
+	width: 100%;
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+.chart {
+	min-height: 400px;
+	margin-bottom: 35px;
+}
+
+.vertical-centered {
+	flex-wrap: wrap;
+	justify-content: center;
 }

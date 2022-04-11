@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Button, Form, InputGroup} from "react-bootstrap";
-import {lang} from "../lang";
 import PropTypes from "prop-types";
+import {lang} from "../lang";
 
 const Options = ({onChange, defaultOptions, loading}) => {
 

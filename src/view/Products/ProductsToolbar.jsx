@@ -1,23 +1,21 @@
 import React from "react";
 import {DropdownButton, Form, Stack} from "react-bootstrap";
-import Multiselect from "../../components/Multiselect";
 import {inject, observer} from "mobx-react";
 import {runInAction} from "mobx";
+import Multiselect from "../../components/Multiselect";
+import Select from "../../components/Select";
 import {lang} from "../../lang";
 
 const ProductsToolbar = inject("ProductsStore")(observer(({ProductsStore}) => (
-        <Stack direction="horizontal" gap={4} style={{flexWrap: 'wrap'}}>
-            <Form.Select
-                style={{maxWidth: 180, cursor: 'pointer'}}
-                onChange={e => runInAction(() => {
-                    ProductsStore.filters.sorting = e.target.value
+        <Stack direction="horizontal" gap={2} style={{flexWrap: 'wrap'}}>
+            <Select
+                items={ProductsStore.sorting}
+                currentItem={ProductsStore.filters.sorting}
+                onChange={current => runInAction(() => {
+                    ProductsStore.filters.sorting = current
                     ProductsStore.filterProducts()
                 })}
-            >
-                <option value={null}>{lang.sorting.default}</option>
-                <option value="az">{lang.sorting.AZ}</option>
-                <option value="za">{lang.sorting.ZA}</option>
-            </Form.Select>
+            />
             <DropdownButton
                 variant="light"
                 title={lang.categories}

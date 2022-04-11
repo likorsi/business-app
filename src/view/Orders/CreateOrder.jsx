@@ -1,13 +1,12 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
-import ModalWindow from "../../components/ModalWindow";
-import {lang} from "../../lang";
-import {Button, ButtonGroup, Card, Dropdown, DropdownButton, Form, InputGroup, Stack} from "react-bootstrap";
+import {Button, ButtonGroup, Card, Form, InputGroup, Stack} from "react-bootstrap";
 import {runInAction} from "mobx";
+import ModalWindow from "../../components/ModalWindow";
 import Search from "../../../public/icons/search.svg";
+import {lang} from "../../lang";
 
-const CreateOrder = inject('OrdersStore')(observer(({OrdersStore}) => {
-    return (
+const CreateOrder = inject('OrdersStore')(observer(({OrdersStore}) => (
         <ModalWindow
             title={OrdersStore.newOrder.id ? `Заказ №${OrdersStore.newOrder.orderNumber}` : lang.createOrder}
             submitText={lang.saveText}
@@ -17,6 +16,9 @@ const CreateOrder = inject('OrdersStore')(observer(({OrdersStore}) => {
             onClose={() => OrdersStore.onCloseWindow()}
             onSubmit={() => OrdersStore.onModifyOrder()}
         >
+            <Card.Subtitle>{lang.ownerOrder.order}</Card.Subtitle>
+            <div className='mb-2'/>
+
             <InputGroup>
                 <Button
                     style={{width: 50}}
@@ -47,6 +49,7 @@ const CreateOrder = inject('OrdersStore')(observer(({OrdersStore}) => {
                 {
                     OrdersStore.products.map( product => (
                         <Button
+                            disabled={product.notAvailable}
                             key={product.id}
                             onClick={() => OrdersStore.addToOrder(product.id)}
                             variant="outline-light"
@@ -100,8 +103,23 @@ const CreateOrder = inject('OrdersStore')(observer(({OrdersStore}) => {
                 {
                     OrdersStore.getProductsList().length === 0
                         ? <p>{lang.noProductsInOrder}</p>
-                        : <p className='wrap' >{lang.order.amount}: {OrdersStore.newOrder.amount} &#8381; </p>
+                        : <p className='wrap' style={{fontSize: '1.2em'}}>{lang.order.amount}: {OrdersStore.newOrder.amount} &#8381; </p>
                 }
+            </Form.Group>
+
+            <div className='mt-4'/>
+            <Card.Subtitle>{lang.ownerOrder.info}</Card.Subtitle>
+
+            <Form.Group className="mb-3 mt-2">
+                <Form.Label><div className='required'/>{lang.order.clientPhone}</Form.Label>
+                {!OrdersStore.newOrder.checkPhone() &&
+                    <p className='hint-warning'>{lang.errorPhone}</p>
+                }
+                <Form.Control
+                    type="text"
+                    value={OrdersStore.newOrder.clientPhone}
+                    onChange={event => runInAction(() => (OrdersStore.newOrder.clientPhone = event.target.value))}
+                />
             </Form.Group>
 
             <Form.Check
@@ -137,7 +155,11 @@ const CreateOrder = inject('OrdersStore')(observer(({OrdersStore}) => {
 
             }
 
+            <div className='mt-4'/>
+            <Card.Subtitle>{lang.ownerOrder.delivery}</Card.Subtitle>
+
             <Form.Check
+                className='mt-2'
                 style={{marginBottom: 15}}
                 defaultChecked={!OrdersStore.newOrder.delivery}
                 label={lang.order.pickup}
@@ -173,7 +195,10 @@ const CreateOrder = inject('OrdersStore')(observer(({OrdersStore}) => {
                 </>
             }
 
-            <Form.Group className="mb-3">
+            <div className='mt-4'/>
+            <Card.Subtitle>{lang.ownerOrder.additional}</Card.Subtitle>
+
+            <Form.Group className="mb-3 mt-2">
                 <Form.Label>{lang.order.description}</Form.Label>
                 <Form.Control
                 as="textarea"
@@ -181,8 +206,13 @@ const CreateOrder = inject('OrdersStore')(observer(({OrdersStore}) => {
                 onChange={event => runInAction(() => (OrdersStore.newOrder.description = event.target.value))}
                 />
             </Form.Group>
+
+            <Stack direction='horizontal' gap={2} style={{fontSize: '1.6em'}}>
+                <p className='wrap'>{lang.clientOrder.amount}:</p>
+                <p className='wrap ms-auto'>{OrdersStore.newOrder.amount} &#8381; </p>
+            </Stack>
+
         </ModalWindow>
-    )
-}))
+)))
 
 export default CreateOrder

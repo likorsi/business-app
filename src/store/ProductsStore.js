@@ -1,8 +1,8 @@
 import {action, computed, makeAutoObservable, observable} from "mobx";
-import {lang} from "../lang";
 import ProductsService from "../service/ProductsService";
 import {Product} from "../domain/Product";
 import {Category} from "../domain/Category";
+import {lang} from "../lang";
 
 class ProductsStore {
 
@@ -22,6 +22,11 @@ class ProductsStore {
     @observable loadingNewProduct = false
 
     @observable categories = []
+    @observable sorting = [
+        {value: lang.sorting.default, id: 'default'},
+        {value: lang.sorting.AZ, id: 'az'},
+        {value: lang.sorting.ZA, id: 'za'},
+    ]
     @observable products = []
     @observable rawProducts = []
     @observable selected = null
@@ -29,7 +34,7 @@ class ProductsStore {
     @observable newProduct = new Product()
 
     @observable filters = {
-        sorting: null,
+        sorting: this.sorting[0],
         checkedCategories: [],
     }
 
@@ -43,10 +48,10 @@ class ProductsStore {
                 ? this.filters.checkedCategories.includes(product.category)
                 : false)
             .sort((a, b) => {
-                if (this.filters.sorting === 'az') {
+                if (this.filters.sorting.id === 'az') {
                     return a.name > b.name ? 1 : (a.name < b.name ? -1 : 0)
                 }
-                if (this.filters.sorting === 'za') {
+                if (this.filters.sorting.id === 'za') {
                     return a.name > b.name ? -1 : (a.name < b.name ? 1 : 0)
                 }
                 return 0
@@ -143,7 +148,6 @@ class ProductsStore {
         await ProductsService.loadProducts()
         this.rawProducts = ProductsService.getProducts()
         this.products = [...this.rawProducts]
-        console.log(this.products)
         this.loading = false
     }
 }

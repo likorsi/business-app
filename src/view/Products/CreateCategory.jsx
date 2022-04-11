@@ -1,9 +1,9 @@
 import React from "react";
-import ModalWindow from "../../components/ModalWindow";
-import {lang} from "../../lang";
 import {Form} from "react-bootstrap";
 import {inject, observer} from "mobx-react";
 import {runInAction} from "mobx";
+import ModalWindow from "../../components/ModalWindow";
+import {lang} from "../../lang";
 
 const CreateCategory = inject("ProductsStore")(observer(({ProductsStore}) => (
     <ModalWindow

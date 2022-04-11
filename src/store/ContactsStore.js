@@ -1,7 +1,7 @@
 import {action, makeAutoObservable, observable} from "mobx";
+import ContactsService from "../service/ContactsService";
 import {Contact} from "../domain/Contact";
 import {lang} from "../lang";
-import ContactsService from "../service/ContactsService";
 
 class ContactsStore {
 

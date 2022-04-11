@@ -1,25 +1,24 @@
 import React, {useEffect} from "react";
 import {inject, observer} from "mobx-react";
+import {runInAction} from "mobx";
+import {useLocation} from "react-router-dom";
 import {Button, Col, Row, Stack} from "react-bootstrap";
 import CardItem from "../../components/CardItem";
 import ModalWindow from "../../components/ModalWindow.jsx";
-import {lang} from "../../lang";
-import ProductsToolbar from "./ProductsToolbar";
 import ToastNotify from "../../components/ToastNotify";
+import {Loader} from "../../components/Loader/Loader";
+import ProductsToolbar from "./ProductsToolbar";
 import CreateProduct from "./CreateProduct";
 import CreateCategory from "./CreateCategory";
-import ShowProduct from "./ShowProduct";
-import {Loader} from "../../components/Loader/Loader";
-import {runInAction} from "mobx";
-import {useLocation} from "react-router-dom";
+import ShowProduct from "../../components/ShowProduct.jsx";
+import {lang} from "../../lang";
 
 const Products = inject("ProductsStore")(observer(({ProductsStore}) => {
-
 
     const location = useLocation()
 
     useEffect(() => {
-        location.pathname === '/products' && ProductsStore.onInit()
+        location.pathname.startsWith('/products') && ProductsStore.onInit()
     }, [location.pathname])
 
     return (
@@ -42,6 +41,7 @@ const Products = inject("ProductsStore")(observer(({ProductsStore}) => {
                                     img={product.images}
                                     title={product.name}
                                     price={product.price}
+                                    notAvailable={product.notAvailable}
                                     badge={product.badge}
                                     onDelete={() => runInAction(() => {
                                         ProductsStore.selected = product

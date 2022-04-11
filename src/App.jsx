@@ -10,45 +10,33 @@ import PublicPage from "./view/Public/PublicPage";
 import Profile from "./view/Profile/Profile";
 import Orders from "./view/Orders/Orders";
 import Tasks from "./view/Tasks/Tasks";
+import Statistics from "./view/Statistics/Statistics";
 import './App.scss';
-import PublicCatalog from "./view/Public/PublicCatalog";
 
-const App = inject('AuthStore')(observer(({AuthStore}) => {
-
-    // let navigate = useNavigate();
-
-    // useEffect(() => {
-    //     // !AuthStore.token && navigate('/')
-    // }, [AuthStore.token])
-
-    return (
+const App = inject('AuthStore')(observer(({AuthStore}) => (
         <Routes>
             <Route path="/" element={<Layout/>}>
                 <Route index element={<Home/>}/>
-                <Route path="users/:user" element={<PublicPage/>}/>
-                <Route path="users/:user/catalog" element={<PublicCatalog/>}/>
+                <Route path="users/:user/*" element={<PublicPage/>}/>
                 <Route path="*" element={<Home/>}/>
                 {
                     !AuthStore.token
                         ?
                             <>
-                                <Route path="/auth" element={<Auth/>}/>
+                                <Route path="/auth/*" element={<Auth/>}/>
                             </>
                         :
                             <>
-                                <Route path="/products" element={<Products/>}/>
-                                <Route path="/orders" element={<Orders/>}/>
-                                <Route path="/tasks" element={<Tasks/>}/>
-                                <Route path="/contacts" element={<Contacts/>}/>
-                                <Route path="/profile" element={<Profile/>}/>
+                                <Route path="/products/*" element={<Products/>}/>
+                                <Route path="/orders/*" element={<Orders/>}/>
+                                <Route path="/tasks/*" element={<Tasks/>}/>
+                                <Route path="/contacts/*" element={<Contacts/>}/>
+                                <Route path="/statistics/*" element={<Statistics/>}/>
+                                <Route path="/profile/*" element={<Profile/>}/>
                             </>
-
                 }
             </Route>
         </Routes>
+)))
 
-    );
-
-}));
-
-export default App;
+export default App

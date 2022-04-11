@@ -1,8 +1,9 @@
-import {action, makeAutoObservable, observable} from "mobx";
-import {lang} from "../lang";
+import {action, makeAutoObservable, observable, when} from "mobx";
 import OrdersService from "../service/OrdersService";
-import {Order} from "../domain/Order";
 import ProductsService from "../service/ProductsService";
+import AuthService from "../service/AuthService";
+import {Order} from "../domain/Order";
+import {lang} from "../lang";
 
 class OrdersStore {
 
@@ -13,6 +14,15 @@ class OrdersStore {
     @observable isModifyWindowOpen = false
     @observable isDeleteWindowOpen = false
     @observable isShowWindowOpen = false
+
+    @observable isShowIncomeWindowOpen = false
+    @observable incomePrompt = false
+    @observable isShowNalogIncomeToast = false
+    @observable isShowRejectIncomeToast = false
+    @observable receiptUrl = ''
+    @observable incomeNumber = ''
+    @observable addIncome = true
+    @observable rejectReason = lang.rejectReason.return
 
     @observable isShowToast = false
     @observable toastText = ''
@@ -27,13 +37,20 @@ class OrdersStore {
     @observable newOrder = new Order()
 
     @observable filters = {
-        sorting: null,
         checkedStatuses: [],
         searchText: '',
         searching: false
     }
 
     @observable searchProductText = ''
+
+    @observable nalogInfo = {
+        useMyNalogOption: false,
+        refreshToken: '',
+        incomeName: '',
+        inn: '',
+        deviceId: ''
+    }
 
     get statuses() {
         return new Array(7)
@@ -85,7 +102,6 @@ class OrdersStore {
     }
 
     @action filterOrders = () => {
-        console.log(this.filtersUsed)
         this.filters.searchText = this.filters.searchText.trim()
         this.orders = !this.filtersUsed
             ? [...this.rawOrders]
@@ -101,16 +117,10 @@ class OrdersStore {
                         || this.beautifyDate(order.dateCreate).includes(this.filters.searchText)
                     : true
                 )
-                .sort((a, b) => {
-                    if (this.filters.sorting === 'edit') {
-                        return a.dateEdit > b.dateEdit ? 1 : (a.dateEdit < b.dateEdit ? -1 : 0)
-                    }
-                    return 0
-                })
     }
 
     get filtersUsed() {
-        return this.filters.sorting === 'edit' || this.filters.searching || this.filters.checkedStatuses.length !== this.statuses.length
+        return this.filters.searching || this.filters.checkedStatuses.length !== this.statuses.length
     }
 
     updateOrders = async () => {
@@ -144,15 +154,54 @@ class OrdersStore {
         await OrdersService.updateStatus(id, status)
         this.error = OrdersService.getError()
         this.toastText = this.error ? lang.errorCreateOrder : lang.successCreateOrder
-        this.isShowToast = true
-        if (!this.error) {
+        const order = this.rawOrders.find(order => order.id === id)
+        this.incomeNumber = order.orderNumber
+        this.receiptUrl = order.receiptUrl
+
+        if (status === '7' && !this.error) {
+            this.addIncome = false
+            this.incomePrompt = false
+            this.isShowIncomeWindowOpen = true
+            await when(() => !this.isShowIncomeWindowOpen)
+            if (this.incomePrompt) {
+                await OrdersService.rejectIncome(id, this.rejectReason)
+                this.error = OrdersService.getError()
+            }
+        }
+
+        if (status === '3'&& !this.error) {
+            this.addIncome = true
+            this.incomePrompt = false
+            this.isShowIncomeWindowOpen = true
+            await when(() => !this.isShowIncomeWindowOpen)
+            if (this.incomePrompt) {
+                await OrdersService.addIncome(id)
+                this.nalogInfo = AuthService.getNalogInfo()
+                this.error = OrdersService.getError()
+            }
+        }
+
+        if (!this.incomePrompt) {
+            this.isShowToast = true
             await this.updateOrders()
-            this.onCloseWindow()
+        }
+
+        if (this.incomePrompt && !this.error) {
+            status === '3' && (this.isShowNalogIncomeToast = true)
+            status === '7' && (this.isShowRejectIncomeToast = true)
+            await this.updateOrders()
+        }
+
+        if (this.incomePrompt && this.error) {
+            this.toastText = lang.errorModifyIncome
+            this.isShowToast = true
         }
     }
 
     @action onInit = async () => {
         this.isShowToast = false
+        this.isShowNalogIncomeToast = false
+        this.isShowRejectIncomeToast = false
         this.loading = true
         await OrdersService.loadOrders()
         this.rawOrders = OrdersService.getOrders()
@@ -161,8 +210,8 @@ class OrdersStore {
         await ProductsService.loadProducts()
         this.rawProducts = ProductsService.getProducts()
         this.products = [...this.rawProducts]
+        this.nalogInfo = AuthService.getNalogInfo()
         this.loading = false
-        console.log(this.rawOrders)
     }
 
 }

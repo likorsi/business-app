@@ -5,10 +5,10 @@ import Notify from '../../public/icons/notify.svg';
 
 const ToastNotify = ({onClose, show, text, delay, isSuccess}) => (
     <Toast
-        style={{position: 'fixed', top: 10, right: 10, zIndex: 40000, maxWidth: 250}}
+        className='fixed-toast'
         onClose={onClose}
         show={show}
-        delay={delay || 10000}
+        delay={delay || 5000}
         bg={isSuccess ? 'success' : 'danger'}
         autohide
     >

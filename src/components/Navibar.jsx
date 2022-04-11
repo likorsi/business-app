@@ -42,7 +42,6 @@ const Navibar = ({auth, links, logout}) => {
 		          			(<Nav.Link
 								as={NavLink}
 					          	to={link.to}
-					          	className={link.status}
 					          	key={index}
 					          >
 					          	{link.label}

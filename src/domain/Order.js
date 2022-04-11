@@ -9,6 +9,7 @@ export class Order {
     id = null
     orderNumber = ''
     client = ''
+    clientPhone = ''
     orderForEntity = false
     inn = ''
     products = {}
@@ -24,10 +25,12 @@ export class Order {
         address: ''
     }
     receiptUrl = ''
+    receiptId = ''
 
-    init = ({id, client, create, edit, products, amount, description, orderNumber, status, delivery, address, orderForEntity, inn, receiptUrl}) => {
+    init = ({id, client, clientPhone, create, edit, products, amount, description, orderNumber, status, delivery, address, orderForEntity, inn, receiptUrl, receiptId}) => {
         this.id = id
         this.client = client
+        this.clientPhone = clientPhone || ''
         this.products = products || {}
         this.amount = amount || 0
         this.description = description || ''
@@ -40,11 +43,13 @@ export class Order {
         this.orderForEntity = orderForEntity
         this.inn = inn
         this.receiptUrl = receiptUrl || ''
+        this.receiptId = receiptId || ''
     }
 
     clear = () => {
         this.id = null
         this.client = ''
+        this.clientPhone = ''
         this.products = {}
         this.amount = 0
         this.description = ''
@@ -61,6 +66,7 @@ export class Order {
         this.orderForEntity = false
         this.inn = ''
         this.receiptUrl = ''
+        this.receiptId = ''
     }
 
     clearAddress = () => {
@@ -79,6 +85,7 @@ export class Order {
 
     checkRequiredFields = () => Object.keys(this.products).length > 0
         && this.client.trim()
+        && this.checkPhone()
         && (this.orderForEntity ? this.checkInn() : true)
         && (this.delivery ? !!this.address.address.trim() : true)
 
@@ -86,5 +93,21 @@ export class Order {
         const re10 = /^[\d+]{10}$/
         const re12 = /^[\d+]{12}$/
         return !this.inn.trim() || re10.test(this.inn) || re12.test(this.inn)
+    }
+
+    checkPhone = () => {
+        const re = /^(\+7|8)[\s(-]{0,2}(\d{3})[\s)-]{0,2}(\d{3})[\s-]?(\d{2})[\s-]?(\d{2})$/g;
+        return !this.clientPhone.trim() || re.test(this.clientPhone.trim())
+    }
+
+    get beautifulPhone() {
+        const regex = /(\+7|8)(\d{3})(\d{3})(\d{2})(\d{2})/g
+        const subst = "$1 ($2) $3-$4-$5"
+        return this.clientPhone.replace(regex, subst)
+    }
+
+    get replacePhone() {
+        const tel = this.clientPhone.replace(/\D/g, '')
+        return this.clientPhone.startsWith('+') ? '+' + tel : tel
     }
 }

@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const dotenv = require('dotenv');
-
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 
 module.exports = () => {
 
@@ -18,7 +18,14 @@ module.exports = () => {
 
     return {
         devServer: {
-            historyApiFallback: true,
+            historyApiFallback: {
+                index:'/',
+                // index: '[./src/index]',
+                rewrites: [
+                    // shows favicon
+                    { from: /favicon.ico/, to: '[./src/favicon]' }
+                ]
+            },
             hot: true,
         },
         output: {
@@ -74,6 +81,7 @@ module.exports = () => {
             new HtmlWebPackPlugin({
                 template: './src/index.html',
             }),
-            new webpack.DefinePlugin(envKeys)
+            new webpack.DefinePlugin(envKeys),
+            new FaviconsWebpackPlugin('./src/favicon.svg')
         ],
     }};

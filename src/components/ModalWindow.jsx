@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import {Button, Modal, Spinner, Stack} from "react-bootstrap";
 import {lang} from "../lang";
 
-const ModalWindow = ({show, title, subtitle, submitType, submitText, onSubmit, onClose, children, disableSave, hideFooter, fullscreen, loading}) => {
+const ModalWindow = ({show, title, subtitle, submitType, submitText, rejectText, onSubmit, onClose, children, disableSave, hideFooter, fullscreen, loading}) => {
     return (
         <>
             <Modal
@@ -39,7 +39,7 @@ const ModalWindow = ({show, title, subtitle, submitType, submitText, onSubmit, o
                                 </div>
                             : <>
                                     <Button variant="light" onClick={() => onClose()}>
-                                        { lang.rejectPromptText }
+                                        { rejectText || lang.rejectPromptText }
                                     </Button>
                                     <Button
                                         disabled={disableSave || false}
@@ -64,6 +64,7 @@ ModalWindow.propTypes = {
     subtitle: PropTypes.string,
     submitType: PropTypes.string,
     submitText: PropTypes.string,
+    rejectText: PropTypes.string,
     onSubmit: PropTypes.func,
     onClose: PropTypes.func.isRequired,
     children: PropTypes.node,

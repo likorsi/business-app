@@ -1,6 +1,6 @@
 import {action, makeAutoObservable, observable} from "mobx";
-import {Task} from "../domain/Task";
 import TasksService from "../service/TasksService";
+import {Task} from "../domain/Task";
 import {lang} from "../lang";
 
 class TasksStore {

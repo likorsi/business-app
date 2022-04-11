@@ -1,11 +1,11 @@
 import React from "react";
-import ModalWindow from "../../components/ModalWindow";
-import {lang} from "../../lang";
 import {Button, Form, InputGroup, Stack} from "react-bootstrap";
 import {inject, observer} from "mobx-react";
-import Money from '../../../public/icons/money.svg';
-import Options from "../../components/Options";
 import {runInAction} from "mobx";
+import ModalWindow from "../../components/ModalWindow";
+import Options from "../../components/Options";
+import Money from '../../../public/icons/money.svg';
+import {lang} from "../../lang";
 
 const CreateProduct = inject("ProductsStore")(observer(({ProductsStore}) => (
         <ModalWindow
@@ -19,6 +19,12 @@ const CreateProduct = inject("ProductsStore")(observer(({ProductsStore}) => (
             onSubmit={() => ProductsStore.onModifyProduct()}
         >
             <Form>
+                <Form.Check
+                    style={{marginBottom: 15}}
+                    defaultChecked={ProductsStore.newProduct?.notAvailable}
+                    label={lang.notAvailable}
+                    onClick={() => runInAction(() => (ProductsStore.newProduct.notAvailable = !ProductsStore.newProduct.notAvailable))}
+                />
                 <Form.Group className="mb-3">
                     <Form.Label><div className='required'/>{lang.product.name}</Form.Label>
                     <Form.Control

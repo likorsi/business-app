@@ -11,13 +11,14 @@ export class Product {
     price = ''
     images = []
     badge = ''
+    notAvailable = false
     description = ''
     options = []
 
     isImagesModified = false
     imagesOld = []
 
-    init = ({id, name, category, price, images, badge, description, options}) => {
+    init = ({id, name, category, price, images, badge, description, options, notAvailable}) => {
         this.id = id
         this.name = name
         this.category = category
@@ -27,6 +28,7 @@ export class Product {
         this.description = description
         this.options = options || []
         this.imagesOld = images || []
+        this.notAvailable = notAvailable
     }
 
     clear = () => {
@@ -38,6 +40,7 @@ export class Product {
         this.badge = ''
         this.description = ''
         this.options = []
+        this.notAvailable = false
 
         this.isImagesModified = false
         this.imagesOld = []

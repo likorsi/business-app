@@ -1,10 +1,14 @@
 import React from "react";
-import styles from './Auth.module.scss'
 import {observer, inject} from "mobx-react";
-import {lang} from "../../lang";
 import {useNavigate} from 'react-router-dom'
 import {Button, Form, Stack} from "react-bootstrap";
+
 import ModalWindow from "../../components/ModalWindow";
+
+import {lang} from "../../lang";
+
+import './Auth.scss'
+import {runInAction} from "mobx";
 
 const Auth = inject("AuthStore")(observer(({AuthStore}) => {
 
@@ -19,8 +23,8 @@ const Auth = inject("AuthStore")(observer(({AuthStore}) => {
 
 	return (
 		<>
-			<h3 className={`container-fluid ${styles.auth}`}>{lang.appTitle}</h3>
-			<Form className={`container-fluid ${styles.authForm}`}>
+			<h3 className='container-fluid auth'>{lang.appTitle}</h3>
+			<Form className='container-fluid authForm'>
 				<Form.Group className="mb-3">
 					<Form.Label><div className='required'/>{lang.inputEmailLabel}</Form.Label>
 					{ !AuthStore.email.valid && <p className='hint-warning'>{lang.inputEmailErrorMsg}</p> }
@@ -41,7 +45,7 @@ const Auth = inject("AuthStore")(observer(({AuthStore}) => {
 					/>
 				</Form.Group>
 				{
-					AuthStore.error ? <div className={styles.error}>{lang.signInError}</div> : null
+					AuthStore.error ? <div className='error'>{lang.signInError}</div> : null
 				}
 				<Stack direction='horizontal' style={{flexWrap: 'wrap'}}>
 					<Button
@@ -73,7 +77,7 @@ const Auth = inject("AuthStore")(observer(({AuthStore}) => {
 			<ModalWindow
 				show={AuthStore.isResetModalWindowOpen}
 				title={lang.resetPasswordTitle}
-				onClose={() => AuthStore.onCloseWindow()}
+				onClose={() => runInAction(() => (AuthStore.isResetModalWindowOpen = false))}
 				hideFooter={true}
 			>
 				{lang.resetPasswordInfo}

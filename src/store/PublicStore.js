@@ -1,8 +1,9 @@
-import {action, computed, makeAutoObservable, observable} from "mobx";
-import {Product} from "../domain/Product";
+import {action, makeAutoObservable, observable} from "mobx";
 import PublicService from "../service/PublicService";
 import {Order} from "../domain/Order";
 import {Photo} from "../domain/Photo";
+import {Product} from "../domain/Product";
+import {lang} from "../lang";
 
 class PublicStore {
     constructor() {
@@ -18,6 +19,11 @@ class PublicStore {
     @observable loading = false
 
     @observable categories = []
+    @observable sorting = [
+        {value: lang.sorting.default, id: 'default'},
+        {value: lang.sorting.AZ, id: 'az'},
+        {value: lang.sorting.ZA, id: 'za'},
+    ]
     @observable products = []
     @observable order = new Order()
     @observable rawProducts = []
@@ -30,7 +36,7 @@ class PublicStore {
     @observable selectedProduct = new Product()
 
     @observable filters = {
-        sorting: null,
+        sorting: this.sorting[0],
         checkedCategories: [],
     }
 
@@ -46,10 +52,10 @@ class PublicStore {
                 ? this.filters.checkedCategories.includes(product.category)
                 : false)
             .sort((a, b) => {
-                if (this.filters.sorting === 'az') {
+                if (this.filters.sorting.id === 'az') {
                     return a.name > b.name ? 1 : (a.name < b.name ? -1 : 0)
                 }
-                if (this.filters.sorting === 'za') {
+                if (this.filters.sorting.id === 'za') {
                     return a.name > b.name ? -1 : (a.name < b.name ? 1 : 0)
                 }
                 return 0
@@ -60,28 +66,45 @@ class PublicStore {
         return this.filters.checkedCategories.length === this.categories.length + 1
     }
 
-    @action addToCart = (product) => {
-        this.order.products[product.id]
-            ? (this.order.products[product.id] += 1)
-            : (this.order.products[product.id] = 1)
+    @action addToCart = id => {
+        this.order.products[id]
+            ? (this.order.products[id] += 1)
+            : (this.order.products[id] = 1)
     }
 
-    @action removeFromCart = (product) => {
-        this.order.products[product.id] -= 1
-        this.order.products[product.id] === 0 && delete this.order.products[product.id]
+    @action removeFromCart = id => {
+        this.order.products[id] -= 1
+        this.order.products[id] === 0 && delete this.order.products[id]
     }
 
     clearCart = () => {
-        this.order.products = []
+        this.order.products = {}
+        this.order.amount = 0
     }
 
-    getProductCountInCart(id) {
-        return this.order.products[id] || 0
+    getProductCountInCart = id => this.order.products[id] || 0
+
+    getProductsList = () => {
+        const keys = Object.keys(this.order.products)
+        let amount = 0
+        const productsList = keys.map(key => {
+            const product = this.rawProducts.find(({id}) => id === key)
+            amount += Number(product.price) * this.order.products[key]
+            return {id: key, name: product.name, count: this.order.products[key]}
+        })
+        this.order.amount = amount
+        return productsList
     }
 
-    createOrder = () => {
-        this.order.clear()
-        this.onCloseWindow()
+    createOrder = async () => {
+        await PublicService.createOrder(this.order)
+        this.error = PublicService.getError()
+        this.toastText = this.error ? lang.errorCreateClientOrder : lang.successCreateClientOrder
+        this.isShowToast = true
+        if (!this.error) {
+            this.order.clear()
+            this.onCloseWindow()
+        }
     }
 
     @action setStartUrl = startUrl => {
@@ -101,8 +124,6 @@ class PublicStore {
         this.publicInfo = PublicService.getPublicInfo()
         this.loading = false
     }
-
-
 }
 
 export default new PublicStore()

@@ -1,15 +1,18 @@
 export const lang = {
     // Common
-    appTitle: 'Business app',
+    appTitle: 'BEASY',
+    appDescribe: 'appDescribe',
     closePromptText: 'Закрыть',
     rejectPromptText: 'Отмена',
     yesPromptText: 'Да',
+    noPromptText: 'Нет',
     deletePromptText: 'Удалить',
     saveText: 'Сохранить',
     findText: 'Найти',
     checkAll: 'Все',
     loading: 'Загрузка...',
     entranceText: 'Войти',
+    notAvailable: 'Нет в наличии',
 
     // NavBar
     entrance: 'Вход',
@@ -31,11 +34,22 @@ export const lang = {
     signUp: 'Зарегистрироваться',
 
     // Public
-    noProductsForOrder: 'Владелец еще не добавил ни одного продукта',
+    noProductsForOrder: 'Владелец еще не добавил ни одной позиции',
     cart: 'Корзина',
     addToCart: 'В корзину',
     productsInCart: 'В корзине ',
-    makeOrder: 'Заказать',
+    makeOrder: 'Оформить',
+    clearCart: 'Очистить корзину',
+    clientOrder: {
+        info: 'Личная информация',
+        order: 'Ваш заказ',
+        delivery: 'Способ доставки',
+        amount: 'Итого',
+        description: 'Информация к заказу',
+        additional: 'Дополнительно'
+    },
+    errorCreateClientOrder: 'Оформить заказ не удалось',
+    successCreateClientOrder: 'Заказ оформлен',
 
     // Profile
     profile: {
@@ -44,9 +58,9 @@ export const lang = {
         login: 'Логин',
         phoneNumber: 'Номер телефона',
         publicUrl: 'Публичная ссылка на аккаунт',
-        publicUrlSub: 'По ссылке для всех пользователей будет доступ к каталогу и созданию заказа' +
-            '\nЗаполните ник, фото профиля и информацию для пользователей, так будет легче узнать вашу страницу',
-        useMyTaxOption: 'Интеграция с «Мой налог»',
+        publicUrlSub: 'По ссылке для всех пользователей будет доступ к каталогу и созданию заказа',
+        publicUrlSub2: 'Заполните ник, фото профиля и информацию для пользователей, так будет легче узнать вашу страницу',
+        useMyNalogOption: 'Интеграция с «Мой налог»',
         newPassword: 'Новый пароль',
         password: 'Пароль',
         name: 'Имя пользователя',
@@ -58,19 +72,20 @@ export const lang = {
     resetPasswordTitle: 'Сброс пароля',
     resetPasswordInfo: 'На вашу почту отправлена инструкция по сбросу пароля.',
     changePassword: 'Изменить пароль',
-    changePasswordHelpText: 'Для изменения пароля необходимо ввести свои прежние учетные данные',
-    changeEmailHelpText: 'Для изменения адреса email необходимо ввести свои прежние учетные данные',
+    changePasswordHelpText: 'Для изменения пароля необходимо ввести текущий пароль',
+    changeEmailHelpText: 'Для изменения адреса email необходимо ввести пароль',
     successSaveUserData: 'Учетные данные сохранены',
     errorSaveUserData: 'Не удалось сохранить учетные данные',
     deleteAccount: 'Удалить аккаунт',
     deleteAccountTitle: 'Удаление аккаунта',
-    deleteAccountPrompt: 'Вы действительно хотите удалить аккаунт? Восстановить данные будет невозможно.',
+    deleteAccountPrompt: 'После удаления аккаунта восстановить данные будет невозможно',
+    deleteAccountHelpText: 'Для удаления аккаунта необходимо ввести пароль',
     errorDeleteAccount: 'Не удалось удалить аккаунт',
     deletePhoto: 'Удаление фото профиля',
     deletePhotoPrompt: 'Вы действительно хотите удалить фото профиля?',
 
-    loginToMyTax: 'Вход в аккаунт приложения "Мой налог"',
-    loginToMyTaxHelp: 'Введите учетные данные своего аккаунта приложения "Мой налог", чтобы автоматичнски отправлять данные о выполненных заказах и получать чеки.',
+    loginToMyNalog: 'Вход в аккаунт приложения "Мой налог"',
+    loginToMyNalogHelp: 'Введите свой логин (инн) и пароль от личного кабинета налогоплательщика, чтобы автоматичнски отправлять данные о выполненных заказах и получать чеки.',
     incomeName: 'Наименование товара/услуги для "Мой налог"',
     incomeNameShort: 'Наименование товара/услуги',
     incomeNameHelp: 'Номер для каждой продажи будет подставлен автоматически в соответствии с номером заказа',
@@ -78,29 +93,29 @@ export const lang = {
     addIncomeName: 'Добавьте наименование товара/услуги для создания новых продаж',
 
     // Products
-    noProductsWithThisFilters: 'Нет продуктов, удовлетворяющих условиям поиска',
-    noProducts: 'Нет добавленных продуктов',
+    noProductsWithThisFilters: 'Нет позиций, удовлетворяющих условиям поиска',
+    noProducts: 'Нет добавленных позиций',
     categories: 'Категории',
     addCategory: 'Добавить категорию',
-    addProduct: 'Добавить продукт',
+    addProduct: 'Добавить позицию',
     showProductsWithBadge: 'С наклейкой',
     sorting: {
-        default: 'По добавлению',
+        default: 'Сначала новые',
         edit: 'По изменению',
         AZ: 'От А до Я',
         ZA: 'От Я до А',
     },
     noCategory: 'Без категории',
-    editProduct: 'Изменение продукта',
+    editProduct: 'Изменение позиции',
     imagesEditHint: 'Выбор новых изображений заменит старые',
     imagesHint: 'Допустимые форматы: png, svg, jpg, jpeg',
     removeImages: 'Удалить все изображения',
-    createProduct: 'Добавление продукта',
-    errorCreateProduct: 'Сохранить продукт не удалось',
-    successCreateProduct: 'Продукт сохранен',
-    deleteProduct: 'Удаление продукта',
-    errorDeleteProduct: 'Удалить продукт не удалось',
-    successDeleteProduct: 'Продукт удален',
+    createProduct: 'Добавление позиции',
+    errorCreateProduct: 'Сохранить позицию не удалось',
+    successCreateProduct: 'Позиция сохранена',
+    deleteProduct: 'Удаление позиции',
+    errorDeleteProduct: 'Удалить позицию не удалось',
+    successDeleteProduct: 'Позиция удалена',
 
     createCategory: 'Добавление категории',
     errorCreateCategory: 'Сохранить категорию не удалось',
@@ -168,8 +183,8 @@ export const lang = {
     errorDeleteOrder: 'Удалить заказ не удалось',
     successDeleteOrder: 'Заказ удален',
     findOrder: 'Найти заказ',
-    findProduct: 'Найти продукт',
-    noProductsInOrder: 'Добавьте продукты в заказ',
+    findProduct: 'Найти позицию',
+    noProductsInOrder: 'Добавьте хотя бы одну позицию в заказ',
     orderStatus: {
         1: 'Создан',
         2: 'Ожидает оплаты',
@@ -190,6 +205,7 @@ export const lang = {
     },
     order: {
         client: 'Заказчик',
+        clientPhone: 'Номер телефона',
         products: 'Состав заказа',
         amount: 'Стоимость',
         description: 'Описание',
@@ -206,6 +222,32 @@ export const lang = {
         entityPlaceholder: 'Юридическое название',
         receipt: 'Чек'
     },
+    ownerOrder: {
+        info: 'Информация о заказчике',
+        order: 'Заказ',
+        delivery: 'Способ доставки',
+        amount: 'Итого',
+        description: 'Информация к заказу',
+        additional: 'Дополнительно'
+    },
     russia: 'Россия',
     errorInn: 'ИНН для ЮЛ содержит 10 цифр, для ИП - 12',
+    errorPhone: 'Некорректный номер телефона',
+    yourRecipe: 'Ваш чек',
+    rejectRecipe: 'Чек аннулирован',
+    successAddIncome: 'Добавлена новая продажа',
+    successRejectIncome: 'Продажа отменена',
+    rejectIncome: 'Аннулирование чека',
+    addIncome: 'Добавление продажи',
+    errorModifyIncome: 'Не удалось отправить изменения в "Мой налог"',
+    reason: 'Причина:',
+    rejectReason: {
+        return: 'Возврат средств',
+        mistake: 'Чек сформирован ошибочно'
+    },
+
+    // Statistics
+    noStatistics: 'Недостаточно данных для отображения статистики',
+    ordersByMonth: 'Статистика по заказам за год',
+    topProducts: 'Топ позиций за все время',
 }

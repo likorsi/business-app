@@ -1,9 +1,8 @@
 import {action, computed, makeAutoObservable, observable} from "mobx";
-
-import AuthService from "../service/AuthService.js";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
-import {lang} from "../lang";
+import AuthService from "../service/AuthService.js";
 import {Photo} from "../domain/Photo";
+import {lang} from "../lang";
 
 class AuthStore {
     constructor() {
@@ -23,26 +22,27 @@ class AuthStore {
     @observable profile = null
     @observable publicUrl = null
     @observable nalogInfo = {
-        useMyTaxOption: false,
-        token: '',
-        incomeName: ''
+        useMyNalogOption: false,
+        refreshToken: '',
+        incomeName: '',
+        inn: '',
+        deviceId: ''
     }
     @observable publicInfo = {
         username: '',
         photo: new Photo(),
         helpText: ''
     }
-    @observable useMyTaxChecked = false
 
     @observable password = {
         value: '',
-        valid: false,
+        valid: true,
         touched: false
     }
 
     @observable email = {
         value: '',
-        valid: false,
+        valid: true,
         touched: false
     }
 
@@ -65,7 +65,7 @@ class AuthStore {
     @observable isDeletePhotoWindowOpen = false
     @observable isDeleteAccountWindowOpen = false
     @observable isResetModalWindowOpen = false
-    @observable isLoginToMyTaxWindowOpen = false
+    @observable isLoginToMyNalogWindowOpen = false
     @observable isEditIncomeNameWindowOpen = false
 
     @observable isShowToast = false
@@ -100,11 +100,6 @@ class AuthStore {
         await AuthService.logout()
         this.updateData()
     }
-
-    // @action autoLogin = () => {
-    //     AuthService.autoLogin()
-    //     this.updateData()
-    // }
 
     validateEmail = value => {
         let re = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
@@ -144,7 +139,7 @@ class AuthStore {
         this.isEditPhotoWindowOpen = false
         this.isDeletePhotoWindowOpen = false
         this.isResetModalWindowOpen = false
-        this.isLoginToMyTaxWindowOpen = false
+        this.isLoginToMyNalogWindowOpen = false
         this.isEditIncomeNameWindowOpen = false
         this.email.value = ''
         this.email.touched = false
@@ -165,7 +160,7 @@ class AuthStore {
     }
 
     onEditEmail = async () => {
-        await AuthService.updateUserEmail(this.newEmail, this.email.value, this.password.value)
+        await AuthService.updateUserEmail(this.newEmail, this.password.value)
         this.error = AuthService.getError()
         this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
         this.isShowToast = true
@@ -176,7 +171,7 @@ class AuthStore {
     }
 
     onEditPassword = async () => {
-        await AuthService.updateUserPassword(this.newPassword, this.email.value, this.password.value)
+        await AuthService.updateUserPassword(this.newPassword, this.password.value)
         this.error = AuthService.getError()
         this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
         this.isShowToast = true
@@ -223,7 +218,7 @@ class AuthStore {
     }
 
     onDeleteAccount = async () => {
-        await AuthService.deleteUserAccount()
+        await AuthService.deleteUserAccount(this.password.value)
         this.error = AuthService.getError()
         if (this.error) {
             this.toastText = lang.errorDeleteAccount
@@ -234,8 +229,8 @@ class AuthStore {
         }
     }
 
-    onResetCheckMyTaxOption = async () => {
-        await AuthService.resetCheckMyTaxOption()
+    onResetCheckMyNalogOption = async () => {
+        await AuthService.resetCheckMyNalogOption()
         this.error = AuthService.getError()
         this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
         this.isShowToast = true
@@ -245,8 +240,8 @@ class AuthStore {
         }
     }
 
-    onLoginToMyTax = async () => {
-        await AuthService.loginToMyTax(this.newEmail, this.newPassword)
+    onLoginToMyNalog = async () => {
+        await AuthService.loginToMyNalog(this.newEmail, this.newPassword)
         this.error = AuthService.getError()
         this.toastText = this.error ? lang.errorSaveUserData : lang.successSaveUserData
         this.isShowToast = true
@@ -269,7 +264,7 @@ class AuthStore {
 
     onInitProfile = async () => {
         this.isShowToast = false
-        await AuthService.loadMyTaxOption()
+        await AuthService.loadMyNalogOption()
         this.nalogInfo = AuthService.getNalogInfo()
         this.publicInfo = AuthService.getPublicInfo()
     }

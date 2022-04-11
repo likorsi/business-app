@@ -17,14 +17,6 @@ export class Photo {
         this.src = src
     }
 
-    checkNew = flag => {
-        this.new = !!flag
-    }
-
-    checkForRemove = flag => {
-        this.forRemove = !!flag
-    }
-
     getPhotoToLoad = () => ({
         src: this.src,
         fullPath: this.fullPath,

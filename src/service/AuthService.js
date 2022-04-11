@@ -12,8 +12,8 @@ import {
     sendPasswordResetEmail
 } from "firebase/auth";
 import {getDatabase, set, ref as refDB, update, onValue, get, child, remove} from "firebase/database";
-import NalogAPI from "moy-nalog";
 import {deleteObject, getDownloadURL, getStorage, ref, uploadBytes} from "firebase/storage";
+import NalogAPI from "moy-nalog";
 import {Photo} from "../domain/Photo.js";
 
 class AuthService {
@@ -31,21 +31,22 @@ class AuthService {
         this.error = null
         this.profile = null
         this.nalogInfo = {
-            useMyTaxOption: false,
-            token: '',
-            incomeName: ''
+            useMyNalogOption: false,
+            refreshToken: '',
+            incomeName: '',
+            inn: '',
+            deviceId: ''
         }
         this.publicInfo = {
             username: '',
             photo: new Photo(),
             helpText: ''
         }
+        this.nalogApi = new NalogAPI({autologin: false})
 
         onAuthStateChanged(getAuth(), async (user) => {
             if (user) {
                 this.profile = user
-                console.log('profile', this.profile)
-
             } else {
                 await this.logout()
                 console.log('User is signed out')
@@ -66,6 +67,7 @@ class AuthService {
 
         onValue(refDB(getDatabase(), `${this.startUrl}/nalog`), snapshot => {
             if (snapshot.exists()) {
+                console.log('this.nalogInfo updated')
                 this.nalogInfo = snapshot.val()
             }
         });
@@ -95,9 +97,6 @@ class AuthService {
             localStorage.setItem('token', this.token)
             localStorage.setItem('userId', response.user.uid)
             this.startUrl = localStorage.getItem('userId')
-            // const expirationDate = new Date(new Date().getTime() + response._tokenResponse.expiresIn * 1000)
-            // localStorage.setItem('expirationDate', expirationDate)
-            // this.autoLogout(response._tokenResponse.expiresIn)
 
             if (isLogin) {
                 const snapshot = await get(child(refDB(getDatabase()), `${this.startUrl}/nalog`))
@@ -110,6 +109,7 @@ class AuthService {
                     helpText: snapshot2.val().helpText,
                     photo: photo
                 }
+                this.nalogApi.refreshToken = this.nalogInfo.trefreshTokenoken
             } else {
                 await set(refDB(getDatabase(), `${this.startUrl}/info`), {
                     username: email,
@@ -121,9 +121,11 @@ class AuthService {
                     helpText: ''
                 })
                 await set(refDB(getDatabase(), `${this.startUrl}/nalog`), {
-                    useMyTaxOption: false,
-                    token: '',
+                    useMyNalogOption: false,
+                    refreshToken: '',
                     incomeName: '',
+                    inn: '',
+                    deviceId: ''
                 })
             }
 
@@ -131,21 +133,8 @@ class AuthService {
 
         } catch (e) {
             this.error = JSON.stringify(e)
-            console.log(this.error)
         }
     }
-
-    // autoLogin = async () => {
-    //     const token = localStorage.getItem('token')
-    //     if (!token) {
-    //         await this.logout()
-    //     } else {
-    //         const expirationDate = new Date(localStorage.getItem('expirationDate'))
-    //         if (expirationDate <= new Date()) {
-    //             await this.logout()
-    //         }
-    //     }
-    // }
 
     updateUsername = async (username) => {
         try {
@@ -206,31 +195,33 @@ class AuthService {
         }
     }
 
-    updateUserEmail = async (newEmail, email, password) => {
+    updateUserEmail = async (newEmail, password) => {
         try {
             this.error = null
-            await signInWithEmailAndPassword(getAuth(), email, password)
+            await signInWithEmailAndPassword(getAuth(), getAuth().currentUser.email, password)
             await updateEmail(getAuth().currentUser, newEmail)
         } catch (e) {
             this.error = e
         }
     }
 
-    updateUserPassword = async (newPassword, email, password) => {
+    updateUserPassword = async (newPassword, password) => {
         try {
             this.error = null
-            await signInWithEmailAndPassword(getAuth(), email, password)
+            await signInWithEmailAndPassword(getAuth(), getAuth().currentUser.email, password)
             await updatePassword(getAuth().currentUser, newPassword)
         } catch (e) {
             this.error = e
         }
     }
 
-    deleteUserAccount = async () => {
+    deleteUserAccount = async (password) => {
         try {
             this.error = null
+            await signInWithEmailAndPassword(getAuth(), getAuth().currentUser.email, password)
+            await remove(refDB(getDatabase(), `${this.startUrl}`))
             await deleteUser(getAuth().currentUser)
-            await remove(refDB(getDatabase(), `${this.startUrl}`));
+            location.reload()
         } catch (e) {
             this.error = e
         }
@@ -245,45 +236,43 @@ class AuthService {
         }
     }
 
-    loginToMyTax = async (login, password) => {
+    loginToMyNalog = async (login, password) => {
         try {
             this.error = null
-            console.log(login, password)
-            const nalog = new NalogAPI({autologin: false})
 
-            await nalog.auth(login, password)
-
-            const nalogToken = nalog.token
-            console.log(nalogToken)
-
+            await this.nalogApi.auth(login, password)
             await update(refDB(getDatabase(), `${this.startUrl}/nalog`), {
-                useMyTaxOption: true,
-                token: nalogToken
+                useMyNalogOption: true,
+                refreshToken: this.nalogApi.refreshToken,
+                inn: login,
+                deviceId: this.nalogApi.sourceDeviceId
             });
         } catch (e) {
             this.error = e
         }
     }
 
-    resetCheckMyTaxOption = async () => {
+    resetCheckMyNalogOption = async () => {
         try {
             this.error = null
             await update(refDB(getDatabase(), `${this.startUrl}/nalog`), {
-                useMyTaxOption: false,
-                token: ''
+                useMyNalogOption: false,
+                refreshToken: '',
+                inn: '',
+                deviceId: ''
             });
         } catch (e) {
             this.error = e
         }
     }
 
-    loadMyTaxOption = async () => {
+    loadMyNalogOption = async () => {
         try {
             this.error = null
             const snapshot = await get(child(refDB(getDatabase()), `${this.startUrl}/nalog`))
 
             if (snapshot.exists()) {
-                this.useMyTax = snapshot.val().useMyTaxOption
+                this.nalogInfo.useMyNalogOption = snapshot.val().useMyNalogOption
             }
 
         } catch (e) {
@@ -306,15 +295,20 @@ class AuthService {
 
     logout = async () => {
         try {
+            this.error = null
             await signOut(this.getAuth)
 
             localStorage.removeItem('token')
             localStorage.removeItem('userId')
-            // localStorage.removeItem('expirationDate')
             this.token = null
 
-        } catch (e) { console.log(e) }
+        } catch (e) { this.error = null }
     }
+
+    refreshToken = () => {
+        
+    }
+
 }
 
 export default new AuthService()

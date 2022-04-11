@@ -1,11 +1,10 @@
 import React from "react";
 import {inject, observer} from "mobx-react";
+import {Badge, Card} from "react-bootstrap";
 import ModalWindow from "../../components/ModalWindow";
-import {Badge, Card, Form, Stack} from "react-bootstrap";
 import {lang} from "../../lang";
 
-const ShowOrder = inject('OrdersStore')(observer(({OrdersStore}) => {
-    return (
+const ShowOrder = inject('OrdersStore')(observer(({OrdersStore}) => (
         <ModalWindow
             title={`Заказ №${OrdersStore.newOrder.orderNumber}`}
             subtitle={lang.orderStatus[OrdersStore.newOrder.status]}
@@ -13,9 +12,22 @@ const ShowOrder = inject('OrdersStore')(observer(({OrdersStore}) => {
             show={OrdersStore.isShowWindowOpen}
             onClose={() => OrdersStore.onCloseWindow()}
         >
+            {
+                OrdersStore.newOrder.receiptUrl &&
+                <>
+                    <Card.Subtitle>{lang.order.receipt}</Card.Subtitle>
+                    <a className='mt-1 wrap' href={OrdersStore.newOrder.receiptUrl} target='_blank'>{OrdersStore.newOrder.receiptUrl}</a>
+                </>
+            }
 
+            <div className='mb-4'/>
             <Card.Subtitle>{lang.order.client}</Card.Subtitle>
-            <p className='mb-4 mt-1'>{OrdersStore.newOrder.client} {OrdersStore.newOrder.inn && `, ${OrdersStore.newOrder.inn}`}</p>
+            <p className='mb-1 mt-1'>{OrdersStore.newOrder.client} {OrdersStore.newOrder.inn && `, ${OrdersStore.newOrder.inn}`}</p>
+            <p className='mb-4 mt-1'>
+                <a href={`tel:${OrdersStore.newOrder.replacePhone}`}>
+                    {OrdersStore.newOrder.beautifulPhone}
+                </a>
+            </p>
 
             <Card.Subtitle>{lang.order.deliveryPlace}</Card.Subtitle>
             {
@@ -41,16 +53,7 @@ const ShowOrder = inject('OrdersStore')(observer(({OrdersStore}) => {
                 </>
             }
 
-            {
-                OrdersStore.newOrder.receiptUrl &&
-                <>
-                    <Card.Subtitle>{lang.order.receipt}</Card.Subtitle>
-                    <a className='mb-4 mt-1' target='_blank'>{OrdersStore.newOrder.receiptUrl}</a>
-                </>
-            }
-
         </ModalWindow>
-    )
-}))
+)))
 
 export default ShowOrder

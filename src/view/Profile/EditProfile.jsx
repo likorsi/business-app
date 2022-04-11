@@ -1,12 +1,11 @@
 import {inject, observer} from "mobx-react";
-import ModalWindow from "../../components/ModalWindow";
-import {lang} from "../../lang";
 import {Form} from "react-bootstrap";
 import {runInAction} from "mobx";
 import React from "react";
+import ModalWindow from "../../components/ModalWindow";
+import {lang} from "../../lang";
 
-const EditProfile = inject("AuthStore")(observer(({AuthStore}) => {
-    return (
+const EditProfile = inject("AuthStore")(observer(({AuthStore}) => (
         <>
             <ModalWindow
                 title={lang.deletePhoto}
@@ -63,7 +62,7 @@ const EditProfile = inject("AuthStore")(observer(({AuthStore}) => {
                 subtitle={lang.changeEmailHelpText}
                 submitText={lang.saveText}
                 submitType='outline-info'
-                disableSave={!(AuthStore.validateEmail(AuthStore.newEmail) && AuthStore.isFormValid)}
+                disableSave={!(AuthStore.validateEmail(AuthStore.newEmail) && AuthStore.password.valid)}
                 show={AuthStore.isEditEmailWindowOpen}
                 onClose={() => AuthStore.onCloseWindow()}
                 onSubmit={() => AuthStore.onEditEmail()}
@@ -74,14 +73,6 @@ const EditProfile = inject("AuthStore")(observer(({AuthStore}) => {
                         type="email"
                         value={AuthStore.newEmail}
                         onChange={e => runInAction(() => {AuthStore.newEmail = e.target.value})}
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.profile.email}</Form.Label>
-                    <Form.Control
-                        type="email"
-                        value={AuthStore.email.value}
-                        onChange={e => AuthStore.onChangeEmailHandler(e.target.value)}
                     />
                 </Form.Group>
                 <Form.Group className="mb-3">
@@ -114,32 +105,11 @@ const EditProfile = inject("AuthStore")(observer(({AuthStore}) => {
             </ModalWindow>
 
             <ModalWindow
-                title={lang.incomeName}
-                subtitle={lang.incomeNameHelp}
-                submitText={lang.saveText}
-                submitType='outline-info'
-                disableSave={!AuthStore.newIncomeName.trim() || AuthStore.newIncomeName.length > 255}
-                show={AuthStore.isEditIncomeNameWindowOpen}
-                onClose={() => AuthStore.onCloseWindow()}
-                onSubmit={() => AuthStore.onEditIncomeName()}
-            >
-                <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.incomeNameShort}</Form.Label>
-                    <Form.Control
-                        placeholder={lang.incomeNamePlaceholder}
-                        type="text"
-                        value={AuthStore.newIncomeName}
-                        onChange={e => runInAction(() => {AuthStore.newIncomeName = e.target.value})}
-                    />
-                </Form.Group>
-            </ModalWindow>
-
-            <ModalWindow
                 title={lang.profile.password}
                 subtitle={lang.changePasswordHelpText}
                 submitText={lang.saveText}
                 submitType='outline-info'
-                disableSave={!(AuthStore.validatePassword(AuthStore.newPassword) && AuthStore.isFormValid)}
+                disableSave={!(AuthStore.validatePassword(AuthStore.newPassword) && AuthStore.password.valid)}
                 show={AuthStore.isEditPasswordWindowOpen}
                 onClose={() => AuthStore.onCloseWindow()}
                 onSubmit={() => AuthStore.onEditPassword()}
@@ -154,14 +124,6 @@ const EditProfile = inject("AuthStore")(observer(({AuthStore}) => {
                 </Form.Group>
                 <p className='hint'>{lang.inputPasswordHelpText}</p>
                 <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.profile.email}</Form.Label>
-                    <Form.Control
-                        type="email"
-                        value={AuthStore.email.value}
-                        onChange={e => AuthStore.onChangeEmailHandler(e.target.value)}
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
                     <Form.Label><div className='required'/>{lang.profile.password}</Form.Label>
                     <Form.Control
                         type="password"
@@ -173,42 +135,26 @@ const EditProfile = inject("AuthStore")(observer(({AuthStore}) => {
 
             <ModalWindow
                 title={lang.deleteAccountTitle}
+                subtitle={lang.deleteAccountHelpText}
                 submitText={lang.deletePromptText}
+                disableSave={!AuthStore.validatePassword(AuthStore.password.value)}
                 submitType='outline-danger'
                 show={AuthStore.isDeleteAccountWindowOpen}
                 onClose={() => AuthStore.onCloseWindow()}
                 onSubmit={() => AuthStore.onDeleteAccount()}
-            >{lang.deleteAccountPrompt}</ModalWindow>
-
-            <ModalWindow
-                title={lang.loginToMyTax}
-                submitText={lang.entranceText}
-                submitType='outline-info'
-                disableSave={!(AuthStore.newPassword.trim() && AuthStore.newEmail.trim())}
-                show={AuthStore.isLoginToMyTaxWindowOpen}
-                onClose={() => AuthStore.onCloseWindow()}
-                onSubmit={() => AuthStore.onLoginToMyTax()}
             >
-                <p className='hint'>{lang.loginToMyTaxHelp}</p>
-                <Form.Group className="mb-3">
-                    <Form.Label><div className='required'/>{lang.profile.login}</Form.Label>
-                    <Form.Control
-                        type="text"
-                        value={AuthStore.newEmail}
-                        onChange={e => runInAction(() => {AuthStore.newEmail = e.target.value})}
-                    />
-                </Form.Group>
+                <p className='hint-warning'>{lang.deleteAccountPrompt}</p>
                 <Form.Group className="mb-3">
                     <Form.Label><div className='required'/>{lang.profile.password}</Form.Label>
                     <Form.Control
                         type="password"
-                        value={AuthStore.newPassword}
-                        onChange={e => runInAction(() => {AuthStore.newPassword = e.target.value})}
+                        value={AuthStore.password.value}
+                        onChange={e => AuthStore.onChangePasswordHandler(e.target.value)}
                     />
                 </Form.Group>
             </ModalWindow>
+
         </>
-    )
-}))
+)))
 
 export default EditProfile

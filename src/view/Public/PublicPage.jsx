@@ -1,15 +1,17 @@
 import React, {useEffect} from "react";
 import {useLocation, useParams} from "react-router-dom";
 import {inject, observer} from "mobx-react";
-import {Loader} from "../../components/Loader/Loader";
-import {Button, Card, Col, DropdownButton, Form, Row, Stack} from "react-bootstrap";
-import CardItem from "../../components/CardItem";
 import {runInAction} from "mobx";
-import {lang} from "../../lang";
-import ShowProduct from "../Products/ShowProduct";
+import {Button, Card, Col, DropdownButton, Form, Row, Stack} from "react-bootstrap";
+import {Loader} from "../../components/Loader/Loader";
+import CardItem from "../../components/CardItem";
+import ToastNotify from "../../components/ToastNotify";
+import ShowProduct from "../../components/ShowProduct";
 import Multiselect from "../../components/Multiselect";
+import ShowCart from "./ShowCart";
 import Cart from "../../../public/icons/cart.svg";
-import ShowCart from "./ShowCart.jsx";
+import {lang} from "../../lang";
+import Select from "../../components/Select";
 
 const PublicPage = inject('PublicStore')(observer(({PublicStore}) => {
 
@@ -17,7 +19,7 @@ const PublicPage = inject('PublicStore')(observer(({PublicStore}) => {
     const location = useLocation()
 
     useEffect(() => {
-        if (location.pathname === `/users/${user}`) {
+        if (location.pathname.startsWith(`/users/${user}`)) {
             PublicStore.setStartUrl(user)
             PublicStore.onInit()
         }
@@ -34,20 +36,17 @@ const PublicPage = inject('PublicStore')(observer(({PublicStore}) => {
                 { PublicStore.publicInfo.helpText && <p> {PublicStore.publicInfo.helpText.split('\n').map((row, index) => <span key={index}>{row}<br/></span>)} </p>}
             </Card>
             <Stack direction="horizontal" gap={4} style={{flexWrap: 'wrap'}}>
-                <Form.Select
-                    style={{maxWidth: 180, cursor: 'pointer'}}
-                    onChange={e => runInAction(() => {
-                        PublicStore.filters.sorting = e.target.value
+                <Select
+                    items={PublicStore.sorting}
+                    currentItem={PublicStore.filters.sorting}
+                    onChange={current => runInAction(() => {
+                        PublicStore.filters.sorting = current
                         PublicStore.filterProducts()
                     })}
-                >
-                    <option value={null}>{lang.sorting.default}</option>
-                    <option value="az">{lang.sorting.AZ}</option>
-                    <option value="za">{lang.sorting.ZA}</option>
-                </Form.Select>
+                />
                 <DropdownButton variant="light" title={lang.categories}>
                     <Multiselect
-                        style={{padding: 10}}
+                        style={{padding: 10, maxHeight: 200}}
                         items={PublicStore.categories}
                         untitledItem={lang.noCategory}
                         onChange={checked => runInAction(() => {
@@ -81,6 +80,7 @@ const PublicPage = inject('PublicStore')(observer(({PublicStore}) => {
                                 <CardItem
                                     img={product.images}
                                     title={product.name}
+                                    notAvailable={product.notAvailable}
                                     price={product.price}
                                     badge={product.badge}
                                     onCardClick={() => runInAction(() => {
@@ -89,10 +89,10 @@ const PublicPage = inject('PublicStore')(observer(({PublicStore}) => {
                                     })}
                                     productCountInCart={PublicStore.getProductCountInCart(product.id)}
                                     onAddToCart={() => runInAction(() => {
-                                        PublicStore.addToCart(product)
+                                        PublicStore.addToCart(product.id)
                                     })}
                                     onRemoveFromCart={() => runInAction(() => {
-                                        PublicStore.removeFromCart(product)
+                                        PublicStore.removeFromCart(product.id)
                                     })}
                                 >{product.description?.split('\n').map((row, index) => <span key={index}>{row}<br/></span>) || ''}</CardItem>
                             </Col>
@@ -107,9 +107,16 @@ const PublicPage = inject('PublicStore')(observer(({PublicStore}) => {
                     categories={PublicStore.categories}
                     selected={PublicStore.selectedProduct}
                     onCloseWindow={() => PublicStore.onCloseWindow()}
-                    onAddToCart={() => PublicStore.addToCart()}
+                    onAddToCart={() => PublicStore.addToCart(PublicStore.selectedProduct.id)}
                 />
             }
+
+            <ToastNotify
+                show={PublicStore.isShowToast}
+                onClose={() => (runInAction(() => PublicStore.isShowToast = false))}
+                text={PublicStore.toastText}
+                isSuccess={!PublicStore.error}
+            />
 
             <ShowCart/>
         </>

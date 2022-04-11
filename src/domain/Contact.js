@@ -6,32 +6,38 @@ export class Contact {
     }
 
     id = null
-    name = null
-    phone = null
-    description = null
+    name = ''
+    phone = ''
+    description = ''
 
     init = ({id, name, phone, description}) => {
         this.id = id
         this.name = name
         this.phone = phone
-        this.description = description
+        this.description = description || ''
     }
 
     clear = () => {
         this.id = null
-        this.name = null
-        this.phone = null
-        this.description = null
+        this.name = ''
+        this.phone = ''
+        this.description = ''
     }
 
     validatePhone = () => {
-        const re = /^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/
-        return re.test(this.phone?.trim())
+        const re = /^(\+7|8)[\s(-]{0,2}(\d{3})[\s)-]{0,2}(\d{3})[\s-]?(\d{2})[\s-]?(\d{2})$/g;
+        return !this.phone.trim() || re.test(this.phone.trim())
+    }
+
+    get beautifulPhone() {
+        const regex = /(\+7|8)(\d{3})(\d{3})(\d{2})(\d{2})/g
+        const subst = "$1 ($2) $3-$4-$5"
+        return this.phone.replace(regex, subst)
     }
 
     get replacePhone() {
-        let tel = this.phone.replace(/\D/g, '')
-        return tel.startsWith('7') ? '+' + tel : tel
+        const tel = this.phone.replace(/\D/g, '')
+        return this.phone.startsWith('+') ? '+' + tel : tel
     }
 
     checkRequiredFields = () => !!this.name?.trim() && this.validatePhone()

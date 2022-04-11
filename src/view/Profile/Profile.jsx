@@ -1,21 +1,23 @@
 import React, {useEffect} from "react";
+import {useLocation} from "react-router-dom";
 import {Button, Card, Form, Stack} from "react-bootstrap";
 import {inject, observer} from "mobx-react";
-import {lang} from "../../lang";
-import Edit from "../../../public/icons/edit.svg";
-import Delete from "../../../public/icons/delete.svg";
 import {runInAction} from "mobx";
 import ToastNotify from "../../components/ToastNotify";
-import {useLocation} from "react-router-dom";
-import EmptyCard from "../../../public/icons/emptyCard.svg";
 import EditProfile from "./EditProfile";
+import MyNalogActions from "./MyNalogActions";
+import Edit from "../../../public/icons/edit.svg";
+import Delete from "../../../public/icons/delete.svg";
+import EmptyCard from "../../../public/icons/emptyCard.svg";
+import {lang} from "../../lang";
+
 
 const Profile = inject("AuthStore")(observer(({AuthStore}) => {
 
     const location = useLocation()
 
     useEffect(() => {
-        location.pathname === '/profile' && AuthStore.onInitProfile()
+        location.pathname.startsWith('/profile') && AuthStore.onInitProfile()
     }, [location.pathname])
 
     return (
@@ -73,18 +75,17 @@ const Profile = inject("AuthStore")(observer(({AuthStore}) => {
 
                     <Form.Check
                         style={{marginBottom: 15}}
-                        checked={AuthStore.nalogInfo.useMyTaxOption}
-                        label={lang.profile.useMyTaxOption}
+                        checked={AuthStore.nalogInfo.useMyNalogOption}
+                        label={lang.profile.useMyNalogOption}
                         onChange={e => runInAction(() => {
-                            AuthStore.useMyTaxChecked = e.target.checked
                             e.target.checked
-                                ? (AuthStore.isLoginToMyTaxWindowOpen = true)
-                                :  AuthStore.onResetCheckMyTaxOption()
+                                ? (AuthStore.isLoginToMyNalogWindowOpen = true)
+                                :  AuthStore.onResetCheckMyNalogOption()
                         })}
                     />
 
                     {
-                        AuthStore.nalogInfo.useMyTaxOption &&
+                        AuthStore.nalogInfo.useMyNalogOption &&
                         <><Stack direction='horizontal'>
                             <Card.Subtitle>{lang.incomeName}</Card.Subtitle>
                             <Button
@@ -135,7 +136,10 @@ const Profile = inject("AuthStore")(observer(({AuthStore}) => {
 
 
                     <Card.Subtitle>{lang.profile.publicUrl}</Card.Subtitle>
-                    <p className="hint">{lang.profile.publicUrlSub}</p>
+                    <p>
+                        <span className="hint">{lang.profile.publicUrlSub}</span><br/>
+                        <span className="hint">{lang.profile.publicUrlSub2}</span>
+                    </p>
                     <Card.Text><a href={AuthStore.publicUrl} target='_blank'>{AuthStore.publicUrl}</a></Card.Text>
 
                     <Stack direction='horizontal'>
@@ -165,6 +169,7 @@ const Profile = inject("AuthStore")(observer(({AuthStore}) => {
                 </Card.Body>
             </Card>
 
+            <MyNalogActions/>
             <EditProfile/>
 
             <ToastNotify

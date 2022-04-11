@@ -2,34 +2,12 @@ import React from "react";
 import {inject, observer} from "mobx-react";
 import {Button, DropdownButton, Form, InputGroup, Stack} from "react-bootstrap";
 import {runInAction} from "mobx";
-import {lang} from "../../lang";
 import Multiselect from "../../components/Multiselect";
 import Search from '../../../public/icons/search.svg';
+import {lang} from "../../lang";
 
-const OrdersToolbar = inject('OrdersStore')(observer(({OrdersStore}) => {
-   return (
+const OrdersToolbar = inject('OrdersStore')(observer(({OrdersStore}) => (
        <Stack direction="horizontal" gap={4} style={{flexWrap: 'wrap'}}>
-           <Form.Select
-               style={{maxWidth: 180, cursor: 'pointer'}}
-               onChange={e => runInAction(() => {
-                   OrdersStore.filters.sorting = e.target.value
-                   OrdersStore.filterOrders()
-               })}
-           >
-               <option value={null}>{lang.sorting.default}</option>
-               <option value='edit'>{lang.sorting.edit}</option>
-           </Form.Select>
-           <DropdownButton variant="light" title={lang.order.status}>
-               <Multiselect
-                   style={{padding: 10}}
-                   items={OrdersStore.statuses}
-                   onChange={checked => runInAction(() => {
-                       OrdersStore.filters.checkedStatuses = checked
-                       OrdersStore.filterOrders()
-                   })}
-                   checked={OrdersStore.filters.checkedStatuses}
-               />
-           </DropdownButton>
            <InputGroup style={{maxWidth: 300}} >
                <Button
                    style={{width: 50}}
@@ -60,8 +38,18 @@ const OrdersToolbar = inject('OrdersStore')(observer(({OrdersStore}) => {
                    </Button>
                }
            </InputGroup>
+           <DropdownButton variant="light" title={lang.order.status}>
+               <Multiselect
+                   style={{padding: 10}}
+                   items={OrdersStore.statuses}
+                   onChange={checked => runInAction(() => {
+                       OrdersStore.filters.checkedStatuses = checked
+                       OrdersStore.filterOrders()
+                   })}
+                   checked={OrdersStore.filters.checkedStatuses}
+               />
+           </DropdownButton>
        </Stack>
-   )
-}))
+)))
 
 export default OrdersToolbar

@@ -3,19 +3,19 @@ import {inject, observer} from "mobx-react";
 import {useLocation} from "react-router-dom";
 import {Button, Form, InputGroup, Stack, Table} from "react-bootstrap";
 import {runInAction} from "mobx";
-import {lang} from "../../lang";
 import {Loader} from "../../components/Loader/Loader";
-import Delete from "../../../public/icons/delete.svg";
-import Edit from "../../../public/icons/edit.svg";
 import ToastNotify from "../../components/ToastNotify";
 import ModalWindow from "../../components/ModalWindow";
+import Delete from "../../../public/icons/delete.svg";
+import Edit from "../../../public/icons/edit.svg";
+import {lang} from "../../lang";
 
 const Tasks = inject('TasksStore')(observer(({TasksStore}) => {
 
     const location = useLocation()
 
     useEffect(() => {
-        location.pathname === '/tasks' && TasksStore.onInit()
+        location.pathname.startsWith('/tasks') && TasksStore.onInit()
     }, [location.pathname])
 
     return (
@@ -23,7 +23,7 @@ const Tasks = inject('TasksStore')(observer(({TasksStore}) => {
             <Stack direction="horizontal" gap={2} style={{flexWrap: 'wrap', marginBottom: 5}}>
                 <InputGroup className="mb-3">
                     <Button
-                        style={{width: 50}}
+                        style={{width: 50, marginRight: 1}}
                         variant="outline-success"
                         disabled={!TasksStore.newTask.checkRequiredFields()}
                         onClick={() => runInAction(async () => await TasksStore.onModifyTask())}>
@@ -37,7 +37,7 @@ const Tasks = inject('TasksStore')(observer(({TasksStore}) => {
                     />
                     { TasksStore.isModifyTask &&
                         <Button
-                            style={{width: 50}}
+                            style={{width: 50, marginLeft: 1}}
                             variant="outline-danger"
                             onClick={() => runInAction( () => {
                                 TasksStore.isModifyTask = false

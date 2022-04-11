@@ -1,9 +1,9 @@
 import React from "react";
-import ModalWindow from "../../components/ModalWindow";
-import {lang} from "../../lang";
 import {Form} from "react-bootstrap";
 import {inject, observer} from "mobx-react";
 import {runInAction} from "mobx";
+import ModalWindow from "../../components/ModalWindow";
+import {lang} from "../../lang";
 
 const CreateContact = inject("ContactsStore")(observer(({ContactsStore}) => (
     <ModalWindow
@@ -25,9 +25,13 @@ const CreateContact = inject("ContactsStore")(observer(({ContactsStore}) => (
         </Form.Group>
         <Form.Group className="mb-3">
             <Form.Label><div className='required'/>{lang.contact.phone}</Form.Label>
+            {!ContactsStore.newContact.validatePhone() &&
+                <p className='hint-warning'>{lang.errorPhone}</p>
+            }
             <Form.Control
-                type="text"
-                value={ContactsStore.newContact?.phone || ''}
+                type="tel"
+
+                value={ContactsStore.newContact.phone || ''}
                 onChange={event => runInAction(() => (ContactsStore.newContact.phone = event.target.value))}
             />
         </Form.Group>

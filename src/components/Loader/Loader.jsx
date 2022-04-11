@@ -1,9 +1,8 @@
 import React from "react";
-import classes from './Loader.module.scss'
+import './Loader.scss'
 
-export const Loader = () => {
-	return (
-		<div className={classes.Loader}>
+export const Loader = () => (
+		<div className='loader'>
 			<div/>
 			<div/>
 			<div/>
@@ -17,6 +16,5 @@ export const Loader = () => {
 			<div/>
 			<div/>
 		</div>
-	)
-}
+)
 

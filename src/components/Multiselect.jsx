@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {lang} from "../lang";
 import {Button, Form, Stack} from "react-bootstrap";
+import {lang} from "../lang";
 
 const Multiselect = ({style, items, checked, onChange, onDelete, onEdit, untitledItem}) => (
     <div style={style || {}} className='overflow-auto'>

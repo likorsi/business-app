@@ -1,10 +1,9 @@
 import React from "react";
-import ModalWindow from "../../components/ModalWindow";
 import {Badge, Button, Card, Carousel, Col, Image, Row, Table} from "react-bootstrap";
-import {lang} from "../../lang";
 import PropTypes from "prop-types";
-import {Product} from "../../domain/Product";
-
+import ModalWindow from "./ModalWindow.jsx";
+import {Product} from "../domain/Product.js";
+import {lang} from "../lang.js";
 
 const ShowProduct = ({show, selected, categories, onCloseWindow, onAddToCart}) => {
     return (
@@ -18,9 +17,10 @@ const ShowProduct = ({show, selected, categories, onCloseWindow, onAddToCart}) =
             <Row md={1} className="g-4" style={{padding: 10}}>
                 <Col md={selected.images.length > 0 ? 4 : 8} xs={12} style={{alignSelf:'center'}}>
                     <p style={{marginTop: 10, fontSize: '2.2em'}} className='wrap'>{selected.price} &#8381;</p>
-                    { selected.badge && <div><Badge pill bg="info">{selected.badge}</Badge></div> }
+                    { (selected.badge || selected.notAvailable) && <div><Badge pill bg={selected.notAvailable ? "danger" : "info"}>{selected.notAvailable ? lang.notAvailable : selected.badge}</Badge></div> }
                     { onAddToCart &&
                         <Button
+                            disabled={selected.notAvailable}
                             onClick={() => onAddToCart()}
                             variant="outline-success"
                             size="lg"

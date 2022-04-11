@@ -1,23 +1,22 @@
 import React, {useEffect} from "react";
 import {Button, Stack, Table} from "react-bootstrap";
-import {lang} from "../../lang";
-import ModalWindow from "../../components/ModalWindow.jsx";
-import ToastNotify from "../../components/ToastNotify";
 import {inject, observer} from "mobx-react";
 import {runInAction} from "mobx";
-import CreateContact from "./CreateContact";
-import {Loader} from "../../components/Loader/Loader";
-import Delete from "../../../public/icons/delete.svg";
 import {useLocation} from "react-router-dom";
+import ModalWindow from "../../components/ModalWindow.jsx";
+import ToastNotify from "../../components/ToastNotify";
+import {Loader} from "../../components/Loader/Loader";
+import CreateContact from "./CreateContact";
+import Delete from "../../../public/icons/delete.svg";
 import Edit from "../../../public/icons/edit.svg";
+import {lang} from "../../lang";
 
 const Contacts = inject("ContactsStore")(observer(({ContactsStore}) => {
 
     const location = useLocation()
 
     useEffect(() => {
-        console.log()
-        location.pathname === '/contacts' && ContactsStore.onInit()
+        location.pathname.startsWith('/contacts') && ContactsStore.onInit()
     }, [location.pathname])
 
     return (
@@ -51,7 +50,7 @@ const Contacts = inject("ContactsStore")(observer(({ContactsStore}) => {
                                         href={`tel:${contact.replacePhone}`}
                                         onClick={e => e.stopPropagation()}
                                     >
-                                        {contact.phone}
+                                        {contact.beautifulPhone}
                                     </a>
                                 </td>
                                 {contact.description ? <td>{contact.description.split('\n').map((row, index) => <span key={index}>{row}<br/></span>)}</td> : <td>&ndash;</td>}

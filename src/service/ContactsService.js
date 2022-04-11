@@ -17,7 +17,6 @@ class ContactsService {
                 snapshot.val() && this.updateContacts(snapshot.val())
             } else {
                 this.contacts = []
-                console.log("No data available (contacts)");
             }
         });
     }
@@ -34,22 +33,18 @@ class ContactsService {
 
             await update(refDB(this.db, `${this.startUrl}/contacts/${key}`), {
                 name: contact.name,
-                phone: contact.phone,
+                phone: contact.replacePhone,
                 description: contact.description || ''
             });
-
         } catch (e) {
             this.error = e
-            console.log(e)
         }
     }
 
     deleteContact = async (id) => {
         try {
             this.error = null
-
             await remove(refDB(this.db, `${this.startUrl}/contacts/${id}`));
-
         } catch (e) {
             this.error = e
         }

@@ -6,8 +6,7 @@ import Edit from '../../public/icons/edit.svg';
 import EmptyCard from '../../public/icons/emptyCard.svg';
 import {lang} from "../lang";
 
-const CardItem = ({style, img, price, title, badge, onEdit, onDelete, onCardClick, onAddToCart, onRemoveFromCart, productCountInCart}) => {
-    return (
+const CardItem = ({style, img, price, title, badge, onEdit, onDelete, onCardClick, onAddToCart, onRemoveFromCart, productCountInCart, notAvailable}) => (
         <Card style={{minHeight: 350, height: '100%', ...style}}>
             <Carousel interval={null} controls={img.length > 1}>
                 {
@@ -29,14 +28,14 @@ const CardItem = ({style, img, price, title, badge, onEdit, onDelete, onCardClic
             </Carousel>
 
             <Card.Body
-                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}
+                style={{display: 'flex', flexDirection: 'column'}}
             >
-                <div onClick={() => onCardClick && onCardClick()}>
+                <div onClick={() => onCardClick && onCardClick()} style={{flexGrow: 1}}>
                     <Card.Title>
                         {title}
                     </Card.Title>
                     <Stack direction="horizontal" gap={2} style={{flexWrap: 'wrap'}}>
-                        { badge && <><Badge pill bg="info">{badge}</Badge><br/></> }
+                        { (badge || notAvailable) && <><Badge pill bg={notAvailable ? "danger" : "info"}>{notAvailable ? lang.notAvailable : badge}</Badge><br/></> }
                         <p style={{marginTop: 10, fontSize: '1.6em'}} className='ms-auto wrap'>{price} &#8381;</p>
                     </Stack>
                 </div>
@@ -54,6 +53,7 @@ const CardItem = ({style, img, price, title, badge, onEdit, onDelete, onCardClic
                                 </Button>
                             }
                             <Button
+                                disabled={notAvailable}
                                 onClick={() => onAddToCart()}
                                 variant="outline-success"
                                 size='sm'
@@ -97,7 +97,7 @@ const CardItem = ({style, img, price, title, badge, onEdit, onDelete, onCardClic
                 </Stack>
             </Card.Body>
         </Card>
-)}
+)
 
 CardItem.propTypes = {
     img: PropTypes.array,
@@ -110,7 +110,8 @@ CardItem.propTypes = {
     onCardClick: PropTypes.func,
     onAddToCart: PropTypes.func,
     onRemoveFromCart: PropTypes.func,
-    productCountInCart: PropTypes.number
+    productCountInCart: PropTypes.number,
+    notAvailable: PropTypes.bool
 }
 
 export default CardItem

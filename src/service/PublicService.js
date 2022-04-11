@@ -1,5 +1,5 @@
 import {getAuth} from "firebase/auth";
-import {child, get, getDatabase, ref as refDB} from "firebase/database";
+import {child, get, getDatabase, push, ref as refDB, update} from "firebase/database";
 import {Category} from "../domain/Category";
 import {Product} from "../domain/Product";
 import {Photo} from "../domain/Photo";
@@ -19,6 +19,8 @@ class PublicService {
     }
 
     setStartUrl = (startUrl) => (this.startUrl = startUrl)
+
+    getError = () => this.error
 
     getPublicInfo = () => this.publicInfo
 
@@ -49,14 +51,17 @@ class PublicService {
     }
 
     updateCategories = data => {
-        this.categories = Object.keys(data).map((key) => {
-            const category = new Category()
-            category.init({
-                id: key,
-                name: data[key].name
+        this.categories = Object.keys(data)
+            .map((key) => {
+                const category = new Category()
+                category.init({
+                    id: key,
+                    name: data[key].name
+                })
+                return category
             })
-            return category
-        })
+            .sort((a, b) => a.name > b.name ? 1 : (a.name < b.name ? -1 : 0))
+
     }
 
     getProducts = () => this.products
@@ -87,6 +92,43 @@ class PublicService {
             return product
         })
         this.products = [...this.products.reverse()]
+    }
+
+    createOrder = async (order) => {
+        try {
+            this.error = null
+
+            let ordersCount = null
+            const snapshot = await get(child(refDB(this.db), `${this.startUrl}/orders/ordersCount`))
+            if (snapshot.val()) {
+                ordersCount = snapshot.val() + 1
+            } else {
+                ordersCount = 1
+            }
+
+            const key = push(child(refDB(this.db), `${this.startUrl}/orders/data`)).key;
+
+            const values = {
+                client: order.client,
+                clientPhone: order.replacePhone,
+                amount: order.amount,
+                products: order.products,
+                status: order.status,
+                delivery: order.delivery,
+                address: order.delivery ? order.address : order.clearAddress(),
+                edit: new Date(),
+                orderForEntity: order.orderForEntity,
+                inn: order.inn,
+                description: order.description,
+                orderNumber: ordersCount,
+                receiptUrl: order.receiptUrl,
+                create: new Date()
+            }
+
+            await update(refDB(this.db, `${this.startUrl}/orders/data/${key}`), values)
+            await update(refDB(this.db, `${this.startUrl}/orders`), {ordersCount: ordersCount})
+
+        } catch (e) { this.error = e }
     }
 }
 
