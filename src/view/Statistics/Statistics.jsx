@@ -1,11 +1,20 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {inject, observer} from "mobx-react";
+import {useLocation} from "react-router-dom";
+import {Badge, Card, Nav, OverlayTrigger, ProgressBar, Stack, Tooltip} from "react-bootstrap";
+import {Loader} from "../../components/Loader/Loader";
 import OrdersByMonths from "./OrdersByMonths";
 import TopProducts from "./TopProducts";
 import {lang} from "../../lang";
-import {Loader} from "../../components/Loader/Loader";
 
-const Statistics = inject('OrdersStore')(observer(({OrdersStore}) => {
+const Statistics = inject('StatisticsStore')(observer(({StatisticsStore}) => {
+
+    const location = useLocation()
+
+    useEffect(() => {
+        location.pathname.startsWith('/statistics') && StatisticsStore.onInit()
+    }, [location.pathname])
+
     const data2 = [
         {
             "id": "css",
@@ -148,17 +157,69 @@ const Statistics = inject('OrdersStore')(observer(({OrdersStore}) => {
 
     return (
         <>
-            {/*OrdersStore.loading*/}
-            {/*? <div className='centered'><Loader/></div>*/}
-            {/*: OrdersStore.orders.length > 0*/}
+            <div style={{paddingBottom: 30}}>
+                <Nav
+                    justify
+                    variant="tabs"
+                    defaultActiveKey="all"
+                    className='nav-tabs-dark'
+                    onSelect={eventKey => StatisticsStore.filterStatistics(eventKey)}
+                >
+                    <Nav.Item>
+                        <Nav.Link eventKey="all">{lang.statisticsFilters.all}</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="year">{lang.statisticsFilters.year}</Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="month">{lang.statisticsFilters.month}</Nav.Link>
+                    </Nav.Item>
+                </Nav>
+            </div>
 
-            {/*<div className='centered'>{lang.noStatistics}</div>*/}
+            {
+                StatisticsStore.loading
+                ? <div className='centered'><Loader/></div>
+                : <>
+                    <Stack
+                        direction='horizontal'
+                        gap={2}
+                        style={{justifyContent: 'space-around', textAlign: "center", marginTop: 20, marginBottom: 20}}
+                    >
+                        <div>
+                            <h5>{lang.statisticsGraphics.allIncome}</h5>
+                            <h4><Badge text="success" bg='light'>{(500000.56).toFixed().toString()} &#8381;</Badge></h4>
+                        </div>
+                        <div>
+                            <h5>{lang.statisticsGraphics.ordersCount}</h5>
+                            <Stack direction='horizontal'>
+                                <h5>{134} /
+                                    <OverlayTrigger placement='top' overlay={<Tooltip>Завершено</Tooltip>}>
+                                        <Badge text="success" bg='light' style={{marginRight: 10, marginLeft: 10}}>10</Badge>
+                                    </OverlayTrigger>
+                                    <OverlayTrigger placement='top' overlay={<Tooltip>Отменено</Tooltip>}>
+                                        <Badge text="danger" bg='light' style={{marginRight: 10}}>5</Badge>
+                                    </OverlayTrigger>
+                                    <OverlayTrigger placement='top' overlay={<Tooltip>Остальные</Tooltip>}>
+                                        <Badge text="secondary" bg='light'>20</Badge>
+                                    </OverlayTrigger>
+                                </h5>
+                            </Stack>
+                        </div>
+                    </Stack>
 
-            <h5 className='title'>{lang.ordersByMonth}</h5>
-            <div className='chart'><OrdersByMonths data={data1}/></div>
 
-            <h5 className='title'>{lang.topProducts}</h5>
-            <div className='chart'><TopProducts data={data2}/></div>
+
+                    <h5 className='title'>{lang.statisticsGraphics.income}</h5>
+                    <div className='chart'><OrdersByMonths data={data1}/></div>
+
+                    <h5 className='title'>{lang.statisticsGraphics.orders}</h5>
+                    <div className='chart'><OrdersByMonths data={data1}/></div>
+
+                    <h5 className='title'>{lang.statisticsGraphics.topProducts}</h5>
+                    <div className='chart'><TopProducts data={data2}/></div>
+                </>
+            }
         </>
     )
 }))

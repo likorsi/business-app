@@ -119,3 +119,7 @@ $my-box-shadow: 0 0 0 0 white;
 	flex-wrap: wrap;
 	justify-content: center;
 }
+
+.nav-tabs-dark > .nav-item a {
+	color: rgba(0,0,0,0.55)
+}

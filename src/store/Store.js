@@ -4,6 +4,7 @@ import ContactsStore from "./ContactsStore";
 import OrdersStore from "./OrdersStore";
 import TasksStore from "./TasksStore";
 import PublicStore from "./PublicStore";
+import StatisticsStore from "./StatisticsStore";
 
 class Store {
     constructor() {
@@ -13,6 +14,7 @@ class Store {
         this.OrdersStore = OrdersStore
         this.TasksStore = TasksStore
         this.PublicStore = PublicStore
+        this.StatisticsStore = StatisticsStore
     }
 }
 

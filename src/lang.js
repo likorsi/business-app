@@ -248,6 +248,16 @@ export const lang = {
 
     // Statistics
     noStatistics: 'Недостаточно данных для отображения статистики',
-    ordersByMonth: 'Статистика по заказам за год',
-    topProducts: 'Топ позиций за все время',
+    statisticsFilters: {
+        all: 'Все время',
+        year: 'Год',
+        month: 'Месяц'
+    },
+    statisticsGraphics: {
+        allIncome: 'Общая выручка',
+        ordersCount: 'Всего заказов',
+        income: 'Выручка',
+        orders: 'Статистика по заказам',
+        topProducts: 'Топ позиций',
+    },
 }

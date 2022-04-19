@@ -158,7 +158,7 @@ class OrdersStore {
         this.incomeNumber = order.orderNumber
         this.receiptUrl = order.receiptUrl
 
-        if (status === '7' && !this.error) {
+        if (this.nalogInfo.useMyNalogOption && this.nalogInfo.incomeName && status === '7' && !this.error) {
             this.addIncome = false
             this.incomePrompt = false
             this.isShowIncomeWindowOpen = true
@@ -169,7 +169,7 @@ class OrdersStore {
             }
         }
 
-        if (status === '3'&& !this.error) {
+        if (this.nalogInfo.useMyNalogOption && this.nalogInfo.incomeName && status === '3' && !this.error) {
             this.addIncome = true
             this.incomePrompt = false
             this.isShowIncomeWindowOpen = true

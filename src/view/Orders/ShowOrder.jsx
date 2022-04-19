@@ -17,10 +17,10 @@ const ShowOrder = inject('OrdersStore')(observer(({OrdersStore}) => (
                 <>
                     <Card.Subtitle>{lang.order.receipt}</Card.Subtitle>
                     <a className='mt-1 wrap' href={OrdersStore.newOrder.receiptUrl} target='_blank'>{OrdersStore.newOrder.receiptUrl}</a>
+                    <div className='mb-4'/>
                 </>
             }
 
-            <div className='mb-4'/>
             <Card.Subtitle>{lang.order.client}</Card.Subtitle>
             <p className='mb-1 mt-1'>{OrdersStore.newOrder.client} {OrdersStore.newOrder.inn && `, ${OrdersStore.newOrder.inn}`}</p>
             <p className='mb-4 mt-1'>

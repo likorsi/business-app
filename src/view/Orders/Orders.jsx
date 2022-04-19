@@ -57,7 +57,7 @@ const Orders = inject('OrdersStore')(observer(({OrdersStore}) => {
                                     <td><Badge bg={lang.orderStatusColors[order.status]}>{order.orderNumber}</Badge></td>
                                     <td>
                                         <Form.Select
-                                            style={{maxWidth: 175, minWidth: 100, cursor: 'pointer'}}
+                                            style={{minWidth: 100, cursor: 'pointer'}}
                                             value={order.status}
                                             onClick={e => e.stopPropagation()}
                                             onChange={e => runInAction(() => (OrdersStore.onUpdateStatus(order.id, e.target.value)))}

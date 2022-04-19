@@ -1,5 +1,5 @@
 import React from "react";
-import {DropdownButton, Form, Stack} from "react-bootstrap";
+import {DropdownButton, Stack} from "react-bootstrap";
 import {inject, observer} from "mobx-react";
 import {runInAction} from "mobx";
 import Multiselect from "../../components/Multiselect";
