@@ -98,6 +98,8 @@ class AuthStore {
 
     @action logout = async () => {
         await AuthService.logout()
+        this.password.touched = false
+        this.email.touched = false
         this.updateData()
     }
 
@@ -224,6 +226,8 @@ class AuthStore {
             this.toastText = lang.errorDeleteAccount
             this.isShowToast = true
         } else {
+            this.password.touched = false
+            this.email.touched = false
             this.token = null
             localStorage.removeItem('token')
         }

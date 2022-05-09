@@ -47,6 +47,21 @@ class AuthService {
         onAuthStateChanged(getAuth(), async (user) => {
             if (user) {
                 this.profile = user
+                localStorage.setItem('userId', user.uid)
+                this.startUrl = localStorage.getItem('userId')
+                this.profile = null
+                this.nalogInfo = {
+                    useMyNalogOption: false,
+                    refreshToken: '',
+                    incomeName: '',
+                    inn: '',
+                    deviceId: ''
+                }
+                this.publicInfo = {
+                    username: '',
+                    photo: new Photo(),
+                    helpText: ''
+                }
             } else {
                 await this.logout()
                 console.log('User is signed out')
@@ -88,15 +103,16 @@ class AuthService {
             this.error = null
             let response = null
             if (isLogin) {
-                response = await signInWithEmailAndPassword(this.getAuth, email, password)
+                response = await signInWithEmailAndPassword(getAuth(), email, password)
             } else {
-                response = await createUserWithEmailAndPassword(this.getAuth, email, password)
+                response = await createUserWithEmailAndPassword(getAuth(), email, password)
             }
 
             this.token = response.user.accessToken
             localStorage.setItem('token', this.token)
             localStorage.setItem('userId', response.user.uid)
             this.startUrl = localStorage.getItem('userId')
+            this.getAuth = getAuth()
 
             if (isLogin) {
                 const snapshot = await get(child(refDB(getDatabase()), `${this.startUrl}/nalog`))
@@ -128,9 +144,6 @@ class AuthService {
                     deviceId: ''
                 })
             }
-
-            location.reload()
-
         } catch (e) {
             this.error = JSON.stringify(e)
         }
@@ -221,7 +234,6 @@ class AuthService {
             await signInWithEmailAndPassword(getAuth(), getAuth().currentUser.email, password)
             await remove(refDB(getDatabase(), `${this.startUrl}`))
             await deleteUser(getAuth().currentUser)
-            location.reload()
         } catch (e) {
             this.error = e
         }
@@ -292,7 +304,6 @@ class AuthService {
         }
     }
 
-
     logout = async () => {
         try {
             this.error = null
@@ -304,11 +315,6 @@ class AuthService {
 
         } catch (e) { this.error = null }
     }
-
-    refreshToken = () => {
-        
-    }
-
 }
 
 export default new AuthService()

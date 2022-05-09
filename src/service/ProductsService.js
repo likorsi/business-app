@@ -1,6 +1,6 @@
 import {getDownloadURL, getStorage, ref, uploadBytes, deleteObject} from "firebase/storage";
 import {getDatabase, child, get, push, remove, ref as refDB, onValue, update} from "firebase/database";
-import {getAuth} from "firebase/auth";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
 import {Product} from "../domain/Product";
 import {Category} from "../domain/Category";
 import {Photo} from "../domain/Photo";
@@ -12,12 +12,18 @@ class ProductsService {
         this.categories = []
         this.products = []
         this.error = null
-        this.auth = getAuth()
-        this.db = getDatabase()
-        this.storage = getStorage()
         this.startUrl = localStorage.getItem('userId')
 
-        onValue(refDB(this.db, `${this.startUrl}/categories`), snapshot => {
+        onAuthStateChanged(getAuth(), async (user) => {
+            if (user) {
+                this.startUrl = localStorage.getItem('userId')
+            } else {
+                this.categories = []
+                this.products = []
+            }
+        });
+
+        onValue(refDB(getDatabase(), `${this.startUrl}/categories`), snapshot => {
             if (snapshot.exists()) {
                 snapshot.val() && this.updateCategories(snapshot.val())
             } else {
@@ -25,7 +31,7 @@ class ProductsService {
             }
         });
 
-        onValue(refDB(this.db, `${this.startUrl}/products`),  snapshot => {
+        onValue(refDB(getDatabase(), `${this.startUrl}/products`),  snapshot => {
             if (snapshot.exists()) {
                 snapshot.val() && this.updateProducts(snapshot.val())
             } else {
@@ -42,9 +48,9 @@ class ProductsService {
         try {
             this.error = null
 
-            const key = category.id || push(child(refDB(this.db), `${this.startUrl}/categories`)).key;
+            const key = category.id || push(child(refDB(getDatabase()), `${this.startUrl}/categories`)).key;
 
-            await update(refDB(this.db, `${this.startUrl}/categories/${key}`), {
+            await update(refDB(getDatabase(), `${this.startUrl}/categories/${key}`), {
                 name: category.name
             });
 
@@ -57,7 +63,7 @@ class ProductsService {
         try {
             this.error = null
 
-            await remove(refDB(this.db, `${this.startUrl}/categories/${id}`));
+            await remove(refDB(getDatabase(), `${this.startUrl}/categories/${id}`));
 
         } catch (e) {
             this.error = e
@@ -81,7 +87,7 @@ class ProductsService {
     loadCategories = async () => {
         try {
             this.error = null
-            const snapshot = await get(child(refDB(this.db), `${this.startUrl}/categories`))
+            const snapshot = await get(child(refDB(getDatabase()), `${this.startUrl}/categories`))
             snapshot.val() && this.updateCategories(snapshot.val())
         } catch (e) { this.error = e }
     }
@@ -109,7 +115,7 @@ class ProductsService {
     loadProducts = async () => {
         try {
             this.error = null
-            const snapshot = await get(child(refDB(this.db), `${this.startUrl}/products`))
+            const snapshot = await get(child(refDB(getDatabase()), `${this.startUrl}/products`))
             snapshot.val() && this.updateProducts(snapshot.val())
         } catch (e) {
             this.error = e
@@ -120,20 +126,20 @@ class ProductsService {
         try {
             this.error = null
 
-            const key = product.id || push(child(refDB(this.db), `${this.startUrl}/products`)).key;
+            const key = product.id || push(child(refDB(getDatabase()), `${this.startUrl}/products`)).key;
 
             let imageList = []
 
             if (product.isImagesModified) {
 
                 const promise = product.imagesOld?.map(async file => {
-                    await deleteObject(ref(this.storage, file.fullPath))
+                    await deleteObject(ref(getStorage(), file.fullPath))
                 })
 
                 await Promise.all(promise)
 
                 imageList = product.images?.map(async file => {
-                    const storageRef = ref(this.storage, `${localStorage.getItem('userId')}/${key}/${file.name}`);
+                    const storageRef = ref(getStorage(), `${localStorage.getItem('userId')}/${key}/${file.name}`);
                     await uploadBytes(storageRef, file)
                     const src = await getDownloadURL(ref(getStorage(), storageRef.fullPath))
 
@@ -145,12 +151,12 @@ class ProductsService {
                 imageList = product.images.map(img => img.getPhotoToLoad())
             }
 
-            await update(refDB(this.db, `${this.startUrl}/products/${key}`), {
+            await update(refDB(getDatabase(), `${this.startUrl}/products/${key}`), {
                 name: product.name,
                 category: product.category || '',
                 price: product.price,
                 badge: product.badge || '',
-                notAvailable: product.notAvailable,
+                notAvailable: product.notAvailable || false,
                 description: product.description || '',
                 options: product.options,
                 edit: new Date().toISOString(),
@@ -165,10 +171,10 @@ class ProductsService {
     deleteProduct = async (id, images) => {
         try {
             this.error = null
-            await remove(refDB(this.db, `${this.startUrl}/products/${id}`));
+            await remove(refDB(getDatabase(), `${this.startUrl}/products/${id}`));
 
             images?.map(async file => {
-                await deleteObject(ref(this.storage, file.fullPath))
+                await deleteObject(ref(getStorage(), file.fullPath))
             })
         } catch (e) {
             this.error = e

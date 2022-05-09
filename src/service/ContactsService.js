@@ -1,4 +1,4 @@
-import {getAuth} from "firebase/auth";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
 import {child, get, getDatabase, onValue, push, ref as refDB, remove, update} from "firebase/database";
 import {getStorage} from "firebase/storage";
 import {Contact} from "../domain/Contact";
@@ -11,6 +11,14 @@ class ContactsService {
         this.db = getDatabase()
         this.storage = getStorage()
         this.startUrl = localStorage.getItem('userId')
+
+        onAuthStateChanged(getAuth(), async (user) => {
+            if (user) {
+                this.startUrl = localStorage.getItem('userId')
+            } else {
+                this.contacts = []
+            }
+        });
 
         onValue(refDB(this.db, `${this.startUrl}/contacts`), snapshot => {
             if (snapshot.exists()) {

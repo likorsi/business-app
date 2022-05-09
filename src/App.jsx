@@ -24,6 +24,7 @@ const App = inject('AuthStore')(observer(({AuthStore}) => (
                         ?
                             <>
                                 <Route path="/auth/*" element={<Auth/>}/>
+                                <Route path="*" element={<Home/>}/>
                             </>
                         :
                             <>
@@ -33,6 +34,7 @@ const App = inject('AuthStore')(observer(({AuthStore}) => (
                                 <Route path="/contacts/*" element={<Contacts/>}/>
                                 <Route path="/statistics/*" element={<Statistics/>}/>
                                 <Route path="/profile/*" element={<Profile/>}/>
+                                <Route path="*" element={<Products/>}/>
                             </>
                 }
             </Route>

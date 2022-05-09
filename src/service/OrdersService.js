@@ -1,4 +1,4 @@
-import {getAuth} from "firebase/auth";
+import {getAuth, onAuthStateChanged} from "firebase/auth";
 import {child, get, getDatabase, onValue, push, ref as refDB, remove, update} from "firebase/database";
 import {getStorage} from "firebase/storage";
 import NalogAPI from "moy-nalog";
@@ -8,13 +8,22 @@ import {Order} from "../domain/Order";
 class OrdersService {
     constructor() {
         this.orders = []
-        this.ordersCount = []
+        this.ordersCount = 1
         this.error = null
         this.auth = getAuth()
         this.db = getDatabase()
         this.storage = getStorage()
         this.startUrl = localStorage.getItem('userId')
         this.nalogApi = new NalogAPI({autologin: false})
+
+        onAuthStateChanged(getAuth(), async (user) => {
+            if (user) {
+                this.startUrl = localStorage.getItem('userId')
+            } else {
+                this.orders = []
+                this.ordersCount = 1
+            }
+        });
 
         onValue(refDB(this.db, `${this.startUrl}/orders`), snapshot => {
             if (snapshot.exists()) {
@@ -34,8 +43,6 @@ class OrdersService {
     createOrUpdateOrder = async (order) => {
         try {
             this.error = null
-
-            console.log(order.replacePhone)
 
             const key = order.id || push(child(refDB(this.db), `${this.startUrl}/orders/data`)).key;
 
