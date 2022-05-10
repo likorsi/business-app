@@ -1,17 +1,16 @@
 import React from "react";
 import {ResponsiveLine} from "@nivo/line";
-import {lang} from "../../lang";
 
 const IncomeChart = ({data}) => (
         <ResponsiveLine
             data={data}
-            margin={{ top: 50, right: 110, bottom: 50, left: 100 }}
+            margin={{ top: 20, right: 110, bottom: 50, left: 50 }}
             xScale={{ type: 'point' }}
             yScale={{
                 type: 'linear',
                 min: 'auto',
                 max: 'auto',
-                stacked: true,
+                stacked: false,
                 reverse: false
             }}
             curve="monotoneX"
@@ -30,10 +29,7 @@ const IncomeChart = ({data}) => (
                 format: value => value + ' ₽',
                 tickSize: 5,
                 tickPadding: 3,
-                tickRotation: 0,
-                legend: 'Общая выручка',
-                legendOffset: -90,
-                legendPosition: 'middle'
+                tickRotation: 0
             }}
             pointSize={10}
             pointColor={{ theme: 'background' }}

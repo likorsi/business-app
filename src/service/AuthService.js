@@ -64,7 +64,6 @@ class AuthService {
                 }
             } else {
                 await this.logout()
-                console.log('User is signed out')
             }
         });
 
@@ -82,7 +81,6 @@ class AuthService {
 
         onValue(refDB(getDatabase(), `${this.startUrl}/nalog`), snapshot => {
             if (snapshot.exists()) {
-                console.log('this.nalogInfo updated')
                 this.nalogInfo = snapshot.val()
             }
         });

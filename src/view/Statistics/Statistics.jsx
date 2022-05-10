@@ -58,18 +58,18 @@ const Statistics = inject('StatisticsStore')(observer(({StatisticsStore}) => {
                 <Nav
                     justify
                     variant="tabs"
-                    defaultActiveKey="all"
+                    defaultActiveKey="month"
                     className='nav-tabs-dark'
                     onSelect={eventKey => StatisticsStore.filterStatistics(eventKey)}
                 >
                     <Nav.Item>
-                        <Nav.Link eventKey="all">{lang.statisticsFilters.all}</Nav.Link>
+                        <Nav.Link eventKey="month">{lang.statisticsFilters.month}</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
                         <Nav.Link eventKey="year">{lang.statisticsFilters.year}</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
-                        <Nav.Link eventKey="month">{lang.statisticsFilters.month}</Nav.Link>
+                        <Nav.Link eventKey="all">{lang.statisticsFilters.all}</Nav.Link>
                     </Nav.Item>
                 </Nav>
             </div>

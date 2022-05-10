@@ -25,7 +25,6 @@ class TasksService {
                 snapshot.val() && this.updateTasks(snapshot.val())
             } else {
                 this.tasks = []
-                console.log("No data available (tasks)");
             }
         });
     }

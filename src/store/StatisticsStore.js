@@ -23,7 +23,6 @@ class StatisticsStore {
 
     filterStatistics = period => {
         [this.topProductsData, this.ordersData, this.incomeData] = StatisticsService.getStatistics(period)
-        // console.log(this.incomeData)
     }
 
     @computed get isNotEnoughData() {
@@ -36,7 +35,7 @@ class StatisticsStore {
         await AuthService.loadMyNalogOption()
         this.nalogInfo = StatisticsService.getNalogInfo()
         this.nalogInfo.useMyNalogOption && (this.taxToPay = await StatisticsService.getTax())
-        this.filterStatistics('all')
+        this.filterStatistics('month')
         this.mainInfo = StatisticsService.getMainInfo()
         this.loading = false
     }

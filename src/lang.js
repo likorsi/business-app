@@ -263,11 +263,12 @@ export const lang = {
         ordersCount: 'Всего заказов',
         taxToPay: 'Налог к оплате',
         income: 'Выручка',
-        orders: 'Статистика по заказам',
+        orders: 'Заказы',
         topProducts: 'Топ позиций',
         entity: 'Юр лица',
         individual: 'Физ лица',
         year: 'Год',
+        count: 'Количество'
     },
     months: {
         0: 'январь',

@@ -150,46 +150,18 @@ class StatisticsService {
     getTopOrders = period => {
         const data = []
         const months = Array.from(Array(12).keys())
-        const days = [5, 10, 15, 20, 25]
-        const years = period === 'all' ? [...new Set(this.ordersToPeriod.map(({dateCreate}) => new Date(dateCreate).getFullYear()))].sort() : []
+        const days = Array.from(Array(new Date(this.ordersToPeriod[this.ordersToPeriod.length - 1].dateCreate).getDate()+1).keys()).slice(1)
+        const years = period === 'all' ? [...new Set(this.ordersToPeriod.map(({dateCreate}) => new Date(dateCreate).getFullYear()))].sort() : [];
 
-        if (period === 'all' || period === 'year') {
-            (period === 'all' ? years : months).forEach(item => this.ordersToPeriod.forEach((order) => {
+        (period === 'all' ? years : period === 'year' ? months : days).forEach(item => {
+            const count = this.ordersToPeriod.filter(order => {
                 const date = new Date(order.dateCreate)
-                const income = parseInt(order.status) >= 3 && order.status !== '7' ? order.amount : 0
-                const client = order.orderForEntity ? lang.statisticsGraphics.entity : lang.statisticsGraphics.individual
-                if (period === 'all' && date.getFullYear() === item || period === 'year' && date.getMonth() === item) {
-                    if (data.hasOwnProperty(item)) {
-                        data[item][client] += income
-                    } else {
-                        data[item] = {}
-                        data[item][lang.statisticsGraphics.entity] = order.orderForEntity ? income : 0
-                        data[item][lang.statisticsGraphics.individual] = order.orderForEntity ? 0 : income
-                    }
-                    data[item].period = item
-                }
-            }))
-        }
-        if (period === 'month') {
-            days.forEach(item => this.ordersToPeriod.forEach((order) => {
-                const date = new Date(order.dateCreate)
-                const income = parseInt(order.status) >= 3 && order.status !== '7' ? order.amount : 0
-                const client = order.orderForEntity ? lang.statisticsGraphics.entity : lang.statisticsGraphics.individual
-                if (date.getMonth() === item) {
-                    if (data.hasOwnProperty(item)) {
-                        data[item][client] += income
-                    } else {
-                        data[item] = {}
-                        data[item][lang.statisticsGraphics.entity] = order.orderForEntity ? income : 0
-                        data[item][lang.statisticsGraphics.individual] = order.orderForEntity ? 0 : income
-                    }
-                    data[item].period = item
-                }
-            }))
-        }
-        console.log(Object.values(data))
+                return (period === 'all' && date.getFullYear() === item || period === 'year' && date.getMonth() === item || period === 'month' && date.getDate() === item) && order.status !== '7'
+            }).length
+            data.push({x: period === 'year' ? lang.months[item] : item, y: count})
+        })
 
-        return Object.values(data)
+        return [{id: lang.statisticsGraphics.count, data}]
     }
 
     getIncome = period => {
@@ -213,11 +185,6 @@ class StatisticsService {
             data[lang.statisticsGraphics.entity].push({x: period === 'year' ? lang.months[item] : item, y: sum[lang.statisticsGraphics.entity]})
             data[lang.statisticsGraphics.individual].push({x: period === 'year' ? lang.months[item] : item, y: sum[lang.statisticsGraphics.individual]})
         })
-
-        console.log([
-            {id: lang.statisticsGraphics.entity, data: data[lang.statisticsGraphics.entity]},
-            {id: lang.statisticsGraphics.individual, data: data[lang.statisticsGraphics.individual]},
-        ])
 
         return [
             {id: lang.statisticsGraphics.entity, data: data[lang.statisticsGraphics.entity]},

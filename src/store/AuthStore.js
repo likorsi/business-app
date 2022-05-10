@@ -13,8 +13,7 @@ class AuthStore {
                 this.token = null
             } else {
                 this.token = localStorage.getItem('token')
-                // this.publicUrl = `https://small-business-app/users/${user.uid}`
-                this.publicUrl = `/users/${user.uid}`
+                this.publicUrl = `https://small-business-app/users/${user.uid}`
             }
         });
     }
@@ -110,7 +109,6 @@ class AuthStore {
     }
 
     validatePassword = value => {
-        // let re = /^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}$/
         let re = /^[0-9a-zA-Z]{6,}$/
 
         return value.trim() !== '' && re.test(value)

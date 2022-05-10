@@ -31,7 +31,6 @@ class OrdersService {
             } else {
                 this.orders = []
                 this.ordersCount = 1
-                console.log("No data available (orders)");
             }
         });
     }
@@ -120,45 +119,26 @@ class OrdersService {
             this.error = null
             const order = this.orders.find(order => order.id === id)
             this.initNalogApi()
-            console.log(await this.nalogApi.userInfo())
 
             const nalogInfo = AuthService.getNalogInfo()
-            const payload = {
-                paymentType: 'CASH',
-                ignoreMaxTotalIncomeRestriction: false,
-                client: { contactPhone: null, displayName: null, incomeType: 'FROM_INDIVIDUAL', inn: null },
 
-                requestTime: this.nalogApi.dateToLocalISO(),
-                operationTime: this.nalogApi.dateToLocalISO(new Date()),
-
-                services: [{
-                    name: `${nalogInfo.incomeName} #${order.orderNumber}`, // 'Предоставление информационных услуг #970/2495',
-                    amount: Number(order.amount.toFixed(2)),
-                    quantity: Number(1)
-                }],
-
-                totalAmount: (order.amount * 1).toFixed(2)
-            }
-
-            console.log(payload)
-
-            // const response = await this.nalogApi.addIncome({
-            //     name: `${nalogInfo.incomeName} #${order.orderNumber}`,
-            //     amount: order.amount
-            // })
+            const response = await this.nalogApi.addIncome({
+                name: `${nalogInfo.incomeName} #${order.orderNumber}`,
+                amount: order.amount
+            })
 
             await update(refDB(getDatabase(), `${this.startUrl}/nalog`), {
                 refreshToken: this.nalogApi.refreshToken,
             });
 
-            // if (response.approvedReceiptUuid) {
-            //     await update(refDB(this.db, `${this.startUrl}/orders/data/${id}`), {
-            //         receiptId: response.approvedReceiptUuid,
-            //         receiptUrl: response.printUrl
-            //     })
-            // } else {
-            //     this.error = response.error
-            // }
+            if (response.approvedReceiptUuid) {
+                await update(refDB(this.db, `${this.startUrl}/orders/data/${id}`), {
+                    receiptId: response.approvedReceiptUuid,
+                    receiptUrl: response.printUrl
+                })
+            } else {
+                this.error = response.error
+            }
 
         } catch (e) { this.error = e }
     }
@@ -169,7 +149,6 @@ class OrdersService {
             const order = this.orders.find(order => order.id === id)
 
             this.initNalogApi()
-            console.log(await this.nalogApi.userInfo())
 
             const payload = {
                 comment: rejectReason,
@@ -179,8 +158,7 @@ class OrdersService {
                 requestTime: this.nalogApi.dateToLocalISO(new Date()),
             }
 
-            console.log(payload)
-            // const response = await this.nalogApi.call('cancel', payload)
+            await this.nalogApi.call('cancel', payload)
             await update(refDB(getDatabase(), `${this.startUrl}/nalog`), {
                 refreshToken: this.nalogApi.refreshToken,
             });
