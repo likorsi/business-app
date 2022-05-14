@@ -13,7 +13,7 @@ class AuthStore {
                 this.token = null
             } else {
                 this.token = localStorage.getItem('token')
-                this.publicUrl = `https://small-business-app/users/${user.uid}`
+                this.publicUrl = `small-business-app-ecfa4.firebaseapp.com/users/${user.uid}`
             }
         });
     }
